@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Guru | Absolute Mastery Core</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- DESIGN SYSTEM & VISUAL STYLE VARIABLES --- */
+        :root {
+            --bg-dark: #020306;
+            --panel-glass: rgba(8, 10, 16, 0.88);
+            --gold-classic: #d4af37;
+            --cyan-glow: #00f3ff;
+            --text-main: #e2e8f0;
+            --font-classic: 'Cinzel', serif;
+            --font-code: 'Fira Code', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-code);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        /* --- BACKGROUND FLOATING ELEMENTS --- */
+        .moving-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .matrix-text {
+            position: absolute;
+            color: var(--cyan-glow);
+            font-size: 0.95rem;
+            opacity: 0.05;
+            white-space: pre;
+            animation: driftUp 24s infinite linear;
+        }
+
+        @keyframes driftUp {
+            0% { transform: translateY(105vh) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.12; }
+            90% { opacity: 0.12; }
+            100% { transform: translateY(-20vh) translateX(50px) rotate(4deg); opacity: 0; }
+        }
+
+        /* --- CONTAINER INTERFACE LAYOUTS --- */
+        .glass-shell {
+            position: relative;
+            z-index: 10;
+            background: var(--panel-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(214, 175, 55, 0.18);
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.95), inset 0 0 30px rgba(0, 243, 255, 0.03);
+            border-radius: 16px;
+            padding: 3rem;
+            width: 94%;
+            max-width: 1150px;
+            text-align: center;
+        }
+
+        .classic-header {
+            font-family: var(--font-classic);
+            color: var(--gold-classic);
+            font-size: 3.4rem;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(214, 175, 55, 0.3);
+            margin-bottom: 0.5rem;
+        }
+
+        .luminous-text {
+            color: var(--cyan-glow);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        .sub-narrative {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            margin-bottom: 2.5rem;
+            letter-spacing: 2px;
+        }
+
+        .glow-button {
+            background: transparent;
+            border: 1px solid var(--cyan-glow);
+            color: var(--cyan-glow);
+            padding: 14px 36px;
+            font-family: var(--font-classic);
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        .glow-button:hover {
+            background: var(--cyan-glow);
+            color: var(--bg-dark);
+            box-shadow: 0 0 30px var(--cyan-glow);
+            font-weight: 600;
+        }
+
+        .view-segment { display: none; }
+        .view-segment.active-view { display: block; animation: targetFadeIn 0.5s ease forwards; }
+
+        @keyframes targetFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- AUDIO UTILITY LAYOUT --- */
+        #audio-module {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 100;
+        }
+
+        .audio-trigger {
+            background: rgba(8, 10, 16, 0.85);
+            border: 1px solid var(--gold-classic);
+            color: var(--gold-classic);
+            font-family: var(--font-code);
+            padding: 10px 18px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .audio-trigger:hover {
+            box-shadow: 0 0 15px var(--gold-classic);
+            background: var(--gold-classic);
+            color: var(--bg-dark);
+        }
+
+        /* --- AUTH PORTAL LAYOUTS --- */
+        .auth-container { max-width: 400px; margin: 0 auto; text-align: left; }
+        .portal-input {
+            width: 100%;
+            background: rgba(3, 4, 8, 0.95);
+            border: none;
+            border-bottom: 2px solid rgba(214, 175, 55, 0.3);
+            color: var(--text-main);
+            padding: 14px 10px;
+            margin-bottom: 1.5rem;
+            font-family: var(--font-code);
+            font-size: 1rem;
+            outline: none;
+        }
+        .portal-input:focus { border-color: var(--cyan-glow); }
+
+        /* --- DIAGNOSTIC QUIZ SYSTEM --- */
+        .quiz-wrapper { margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem; }
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            color: var(--text-main);
+            padding: 16px;
+            text-align: left;
+            font-family: var(--font-code);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+        }
+        .quiz-option:hover { border-color: var(--gold-classic); background: rgba(214, 175, 55, 0.04); transform: translateX(5px); }
+
+        /* --- MAIN DASHBOARD STUDIOS GRID --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 2rem;
+            text-align: left;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 850px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+
+        .lesson-navigator {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(214, 175, 55, 0.15);
+            border-radius: 8px;
+            height: 600px;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .lesson-tab-item {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+        .lesson-tab-item:hover { background: rgba(0, 243, 255, 0.04); color: var(--cyan-glow); }
+        .lesson-tab-item.active-lesson { border-left: 3px solid var(--gold-classic); background: rgba(214,175,55,0.05); color: var(--gold-classic); }
+
+        .studio-workspace {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .instruction-box {
+            background: rgba(0,0,0,0.3);
+            border-left: 3px solid var(--cyan-glow);
+            padding: 1.5rem;
+            border-radius: 4px;
+        }
+
+        /* --- WRITABLE FOREGROUND EDITOR SURFACE --- */
+        .editor-canvas {
+            position: relative;
+            height: 240px;
+            background: #030407;
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .editor-shared {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 18px;
+            font-family: var(--font-code);
+            font-size: 1rem;
+            line-height: 1.6;
+            white-space: pre;
+            overflow: auto;
+            border: none;
+            margin: 0;
+            outline: none;
+            background: transparent;
+        }
+
+        .watermark-layer { color: rgba(255, 255, 255, 0.12); z-index: 2; pointer-events: none; }
+        .interactive-foreground { color: var(--cyan-glow); z-index: 3; caret-color: var(--gold-classic); resize: none; }
+        .editor-shared::-webkit-scrollbar { display: none; }
+        .editor-shared { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* --- LIVE MOCK PYTHON TERMINAL OUTPUT --- */
+        .terminal-box {
+            background: #010204;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 15px;
+            height: 120px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            color: #a7f3d0;
+        }
+
+        /* --- AI REALTIME MODAL WINDOW --- */
+        .ai-assist-box {
+            background: rgba(214, 175, 55, 0.03);
+            border: 1px solid rgba(214, 175, 55, 0.2);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        .ai-textbox {
+            width: 100%;
+            background: #05060b;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: var(--text-main);
+            font-family: var(--font-code);
+            padding: 12px;
+            border-radius: 4px;
+            resize: none;
+            height: 80px;
+            outline: none;
+            margin-bottom: 1rem;
+        }
+        .ai-textbox:focus { border-color: var(--gold-classic); }
+        .ai-response-stream {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #cbd5e1;
+            padding: 10px 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="moving-background" id="bg-matrix"></div>
+
+    <div id="audio-module">
+        <button class="audio-trigger" id="audio-control">▶ INITIALIZE AMBIENCE</button>
+        <audio id="ambient-loop" loop>
+            <source src="music.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <div class="glass-shell">
+
+        <section id="stage-landing" class="view-segment active-view">
+            <h1 class="classic-header">Python Guru</h1>
+            <p class="sub-narrative">CLASSICAL FUTURISTIC ARTIFICIAL INTELLIGENCE ENVIRONMENT FOR BEGINNERS</p>
+            <button class="glow-button" onclick="transitionTo('stage-auth')">Access Framework</button>
+        </section>
+
+        <section id="stage-auth" class="view-segment">
+            <h2 class="classic-header" style="font-size: 2.2rem; margin-bottom: 2rem;">Cloud Terminal Access</h2>
+            <div class="auth-container">
+                <input type="email" placeholder="Identity Node (Email)" class="portal-input" id="user-mail">
+                <input type="password" placeholder="Cryptographic Key" class="portal-input">
+                <div style="text-align: center;">
+                    <button class="glow-button" onclick="transitionTo('stage-diagnostic')">Authenticate</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="stage-diagnostic" class="view-segment">
+            <h2 class="classic-header" style="font-size: 2rem;">Initial Neural Calibration</h2>
+            <p class="sub-narrative">Calibrating platform learning interfaces to align with your focus parameters.</p>
+            <div style="text-align: left; padding: 1.2rem; border-left: 2px solid var(--cyan-glow); background: rgba(0,0,0,0.3); margin-bottom: 2rem;">
+                <span class="luminous-text">// Calibration Probe 01</span>
+                <p style="margin-top: 0.5rem;">Have you ever engineered code parameters or software syntax arrays previously?</p>
+            </div>
+            <div class="quiz-wrapper">
+                <button class="quiz-option" onclick="processDiagnostics()">No, I am completely new to code syntax and logic matrices.</button>
+                <button class="quiz-option" onclick="processDiagnostics()">I have observed basic principles but cannot confidently map functional streams.</button>
+            </div>
+            <div id="ai-load-overlay" style="display: none; margin-top: 2rem;" class="luminous-text">
+                <span>⏳ COMPILING 40-STEP SCHEMATIC GRID TO LOCAL STORAGE BUFFERS...</span>
+            </div>
+        </section>
+
+        <section id="stage-dashboard" class="view-segment">
+            <h2 class="classic-header" style="font-size: 2.2rem; margin-bottom: 1rem;">Core Training Matrix</h2>
+            
+            <div class="dashboard-grid">
+                <div class="lesson-navigator" id="lesson-menu-container"></div>
+
+                <div class="studio-workspace">
+                    <div class="instruction-box">
+                        <h3 id="current-lesson-title" class="luminous-text" style="margin-bottom: 0.5rem;">Lesson Loading...</h3>
+                        <p id="current-lesson-desc" style="font-size: 0.95rem; opacity: 0.85; line-height: 1.5;"></p>
+                    </div>
+
+                    <div class="editor-canvas">
+                        <div class="editor-shared watermark-layer" id="code-guide"></div>
+                        <textarea class="editor-shared interactive-foreground" id="editor-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="glow-button" style="font-size: 0.9rem; padding: 10px 24px;" onclick="executePythonMock()">Run Syntax Engine</button>
+                    </div>
+
+                    <div class="terminal-box" id="terminal-screen">
+                        System Online. Input logic stream parameters and trigger run sequence...
+                    </div>
+
+                    <div class="ai-assist-box">
+                        <h4 style="font-family: var(--font-classic); color: var(--gold-classic); margin-bottom: 0.5rem;">Ask AI Assistant Core</h4>
+                        <textarea class="ai-textbox" id="ai-user-query" placeholder="Type your programming roadblock or syntax confusion here..."></textarea>
+                        <button class="glow-button" style="font-size: 0.85rem; padding: 8px 20px;" onclick="requestGroqAIHelp()">Query AI Neural Processor</button>
+                        <div class="ai-response-stream" id="ai-reply-area"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Securely embedded directly into the AI runtime engine data stream
+        const BEGINNER_FORTY_MATRICES = [
+            { id: 1, title: "01: The print() Element", desc: "Output string messages to the display console using print text syntax wrapper constraints.", code: "print(\"Hello Python Guru\")" },
+            { id: 2, title: "02: Code Note Annotations", desc: "Incorporate inline program comments that the compilation interpreter bypasses using the hash symbol.", code: "# This is an operational note" },
+            { id: 3, title: "03: Variable Binding", desc: "Allocate memory space to reference data strings or numerical entities efficiently using assignments.", code: "message = \"Data Matrix Loaded\"" },
+            { id: 4, title: "04: Numerical Integrations", desc: "Bind simple absolute integer variables to local memory without explicit type casting statements.", code: "points = 100" },
+            { id: 5, title: "05: Floating Entities", desc: "Map variable symbols to fractional values requiring precision point notation parameters.", code: "accuracy = 0.98" },
+            { id: 6, title: "06: Basic Arithmetical Flows", desc: "Execute computational mathematical addition parameters on raw memory integers cleanly.", code: "total = 50 + 25" },
+            { id: 7, title: "07: Expression Multipliers", desc: "Perform multiplicative operational steps inside calculations across raw variable components.", code: "area = 10 * 5" },
+            { id: 8, title: "08: String Structures", desc: "Define structural alphanumeric strings safely wrapped inside matched string literal double quotation sets.", code: "syntax = \"Python Core\"" },
+            { id: 9, title: "09: Merging String Assets", desc: "Concatenate multiple separate text arrays dynamically using the standard math addition symbol.", code: "full = \"Core \" + \"Engine\"" },
+            { id: 10, title: "10: Value Conversions", desc: "Cast alphanumeric text instances containing digits safely into absolute integer formats.", code: "converted = int(\"45\")" },
+            { id: 11, title: "11: Dynamic Float Casting", desc: "Transform whole integer values into precise floating-point notation equivalents explicitly.", code: "floating_val = float(10)" },
+            { id: 12, title: "12: Text Multiplications", desc: "Replicate string structures iteratively across the buffer by applying multiplier variables.", code: "glow = \"Glow\" * 3" },
+            { id: 13, title: "13: Boolean States", desc: "Assign direct binary logic evaluation indicators using precise True or False keywords.", code: "system_active = True" },
+            { id: 14, title: "14: Value Equality Probes", desc: "Examine whether independent data variables share matching values using evaluation operators.", code: "is_equal = (10 == 10)" },
+            { id: 15, title: "15: Inequality Tracking", desc: "Determine value variance deviations across parameters using logical inequality comparison symbols.", code: "is_deviant = (5 != 12)" },
+            { id: 16, title: "16: Scale Assessments", desc: "Determine mathematical hierarchy size variances using the greater than or equal comparison tool.", code: "check = (15 >= 10)" },
+            { id: 17, title: "17: Conditional Execution", desc: "Branch system execution behavior using the basic isolated 'if' structural framework wrapper.", code: "if True:\n    print(\"Passed Check\")" },
+            { id: 18, title: "18: Secondary Branch Fallbacks", desc: "Incorporate 'else' logic statements to process statements when previous code requirements fail.", code: "if False:\n    pass\nelse:\n    print(\"Fallback\")" },
+            { id: 19, title: "19: Multi-Tier Branch Chains", desc: "Chain additional conditional evaluation check routes cleanly inside blocks via 'elif' variables.", code: "score = 85\nif score > 90:\n    pass\nelif score > 80:\n    print(\"B Tier\")" },
+            { id: 20, title: "20: Conjunction Logic", desc: "Combine multiple comparison validation statements together using the strict logical 'and' operator.", code: "valid = (5 > 2) and (10 > 8)" },
+            { id: 21, title: "21: Alternative Disjunctions", desc: "Process broader validation requirements where only single criteria matches are needed via 'or'.", code: "status = True or False" },
+            { id: 22, title: "22: Logic Inversions", desc: "Reverse the true or false binary properties of standard validation elements using 'not'.", code: "halt = not True" },
+            { id: 23, title: "23: List Initializations", desc: "Construct mutable index data series clusters containing multiple entities enclosed in brackets.", code: "nodes = [10, 20, 30]" },
+            { id: 24, title: "24: Index Extraction", desc: "Retrieve target elements from a list sequence by specifying their numerical offset tracking key.", code: "items = [5, 9, 2]\ntarget = items[0]" },
+            { id: 25, title: "25: Inverse Index Tracking", desc: "Target tail-end values within an unknown list length sequence using negative indexing notations.", code: "items = [4, 8, 12]\ntail = items[-1]" },
+            { id: 26, title: "26: Modifying Data Elements", desc: "Overwite target values inside an active index matrix directly via offset index assignments.", code: "grid = [1, 2, 3]\ngrid[1] = 99" },
+            { id: 27, title: "27: Array Length Metrics", desc: "Determine total internal counts inside collection datasets utilizing the native len tool.", code: "sizes = len([4, 8, 12])" },
+            { id: 28, title: "28: Appending Data", desc: "Inject new individual target components into the termination point of lists using .append().", code: "logs = []\nlogs.append(\"init\")" },
+            { id: 29, title: "29: Explicit Insert Operations", desc: "Incorporate individual records at specific localized offset keys using the .insert() command.", code: "nums = [1, 3]\nums.insert(1, 2)" },
+            { id: 30, title: "30: Element Purging", desc: "Remove specific target records out of active working list datasets via the .remove() syntax handler.", code: "tech = [\"c\", \"py\"]\ntech.remove(\"c\")" },
+            { id: 31, title: "31: Iterative For Loops", desc: "Cycle across sequential array tracks systematically extracting records via targeted 'for' engines.", code: "for i in [1, 2, 3]:\n    print(i)" },
+            { id: 32, title: "32: Numeric Sequence Generators", desc: "Generate explicit execution iteration indexes cleanly by combining loops with the range() method.", code: "for x in range(5):\n    print(x)" },
+            { id: 33, title: "33: Conditional While Loops", desc: "Maintain code execution patterns endlessly while verification parameters remain true.", code: "runs = 0\nwhile runs < 3:\n    runs += 1" },
+            { id: 34, title: "34: Loop Interrupt Systems", desc: "Force prompt terminations of active internal processing operations instantly using 'break'.", code: "while True:\n    break" },
+            { id: 35, title: "35: Core Function Architectures", desc: "Declare reusable logic blocks matching distinct organizational definitions using the 'def' command.", code: "def matrix_sync():\n    print(\"Synced\")" },
+            { id: 36, title: "36: Execution Invocation", desc: "Invoke targeted isolated function blocks to run parameters using paren execution tools.", code: "def trigger():\n    pass\ntrigger()" },
+            { id: 37, title: "37: Parametric Injections", desc: "Pass raw variables into named function parameters safely across localized module interfaces.", code: "def signal(type):\n    print(type)\nsignal(\"High\")" },
+            { id: 38, title: "38: Return Output Channels", desc: "Pass functional evaluation values back to root execution scopes utilizing the 'return' command.", code: "def evaluate():\n    return 42\nresult = evaluate()" },
+            { id: 39, title: "39: Dictionary Initializations", desc: "Map clear structure relations containing key-value pairings inside curly braces.", code: "user = {\"id\": 101, \"role\": \"admin\"}" },
+            { id: 40, title: "40: Error Exception Wrappers", desc: "Insulate runtime software blocks from crashes using isolated try and except safety nets.", code: "try:\n    value = 1 / 0\nexcept:\n    print(\"Error Trapped\")"
+        ];
+
+        let activeLessonIndex = 0;
+
+        /* --- BACKGROUND PARTICLES GENERATOR ENGINE --- */
+        document.addEventListener("DOMContentLoaded", () => {
+            const bgContainer = document.getElementById("bg-matrix");
+            const structuralSnippets = [
+                "print('Guru Execution')", "def __init__(self):", "while core_active:",
+                "lambda syntax: syntax.run()", "try: processing()", "import architecture"
+            ];
+
+            for (let i = 0; i < 14; i++) {
+                const textNode = document.createElement("span");
+                textNode.className = "matrix-text";
+                textNode.innerText = structuralSnippets[Math.floor(Math.random() * structuralSnippets.length)];
+                textNode.style.left = `${Math.random() * 92}%`;
+                textNode.style.animationDelay = `${Math.random() * 20}s`;
+                textNode.style.fontSize = `${0.85 + Math.random() * 0.4}rem`;
+                bgContainer.appendChild(textNode);
+            }
+
+            buildLessonNavigationMenu();
+            loadCurrentTargetLesson(0);
+            initializeInteractiveEditor();
+        });
+
+        function transitionTo(stageId) {
+            document.querySelectorAll('.view-segment').forEach(view => view.classList.remove('active-view'));
+            document.getElementById(stageId).classList.add('active-view');
+        }
+
+        /* --- AUDIO STREAM LOOPER --- */
+        const nativeAudio = document.getElementById("ambient-loop");
+        const audioBtn = document.getElementById("audio-control");
+        let trackPlaying = false;
+
+        audioBtn.addEventListener("click", () => {
+            if (!trackPlaying) {
+                nativeAudio.play().catch(err => console.log("User interaction required prior to rendering audio tracks locally."));
+                audioBtn.innerText = "⏸ PAUSE AMBIENCE";
+            } else {
+                nativeAudio.pause();
+                audioBtn.innerText = "▶ INITIALIZE AMBIENCE";
+            }
+            trackPlaying = !trackPlaying;
+        });
+
+        /* --- DIAGNOSTIC PROCESSING MAPS --- */
+        function processDiagnostics() {
+            document.getElementById("ai-load-overlay").style.display = "block";
+            setTimeout(() => {
+                document.getElementById("ai-load-overlay").style.display = "none";
+                transitionTo("stage-dashboard");
+            }, 1800);
+        }
+
+        /* --- RENDER LESSON MANAGEMENT INDEX --- */
+        function buildLessonNavigationMenu() {
+            const menuContainer = document.getElementById("lesson-menu-container");
+            menuContainer.innerHTML = "";
+            
+            BEGINNER_FORTY_MATRICES.forEach((lesson, index) => {
+                const item = document.createElement("div");
+                item.className = `lesson-tab-item ${index === 0 ? 'active-lesson' : ''}`;
+                item.id = `lesson-nav-${index}`;
+                item.innerText = lesson.title;
+                item.onclick = () => loadCurrentTargetLesson(index);
+                menuContainer.appendChild(item);
+            });
+        }
+
+        function loadCurrentTargetLesson(index) {
+            activeLessonIndex = index;
+            document.querySelectorAll('.lesson-tab-item').forEach(tab => tab.classList.remove('active-lesson'));
+            document.getElementById(`lesson-nav-${index}`).classList.add('active-lesson');
+
+            const lessonData = BEGINNER_FORTY_MATRICES[index];
+            document.getElementById("current-lesson-title").innerText = lessonData.title;
+            document.getElementById("current-lesson-desc").innerText = lessonData.desc;
+            
+            const guideContainer = document.getElementById("code-guide");
+            guideContainer.innerText = lessonData.code;
+            
+            const txtInput = document.getElementById("editor-input");
+            txtInput.value = "";
+            txtInput.scrollTop = 0;
+            guideContainer.scrollTop = 0;
+
+            document.getElementById("validation-alert").style.color = "var(--text-main)";
+            document.getElementById("validation-alert").innerText = "Input syntax matching alignment layer grid.";
+            document.getElementById("sync-accuracy").innerText = "Accuracy: 0%";
+        }
+
+        /* --- ADVANCED EDITOR INTERACTION ARCHITECTURE --- */
+        function initializeInteractiveEditor() {
+            const textarea = document.getElementById("editor-input");
+            const watermark = document.getElementById("code-guide");
+
+            textarea.addEventListener("scroll", () => {
+                watermark.scrollTop = textarea.scrollTop;
+                watermark.scrollLeft = textarea.scrollLeft;
+            });
+
+            textarea.addEventListener("keydown", (e) => {
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const textVal = textarea.value;
+
+                if (e.key === "Tab") {
+                    e.preventDefault();
+                    textarea.value = textVal.substring(0, start) + "    " + textVal.substring(end);
+                    textarea.selectionStart = textarea.selectionEnd = start + 4;
+                    verifyCodeProgression();
+                }
+
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    const lastNewlineIdx = textVal.lastIndexOf("\n", start - 1) + 1;
+                    const targetLine = textVal.substring(lastNewlineIdx, start);
+                    const spacesMatch = targetLine.match(/^[\s]+/);
+                    const indentation = spacesMatch ? spacesMatch[0] : "";
+
+                    textarea.value = textVal.substring(0, start) + "\n" + indentation + textVal.substring(end);
+                    textarea.selectionStart = textarea.selectionEnd = start + 1 + indentation.length;
+                    verifyCodeProgression();
+                }
+            });
+
+            textarea.addEventListener("input", verifyCodeProgression);
+        }
+
+        function verifyCodeProgression() {
+            const userInput = document.getElementById("editor-input").value;
+            const targetPattern = BEGINNER_FORTY_MATRICES[activeLessonIndex].code;
+            const feedbackAlert = document.getElementById("validation-alert");
+            const accuracyGauge = document.getElementById("sync-accuracy");
+
+            if (userInput === "") {
+                feedbackAlert.style.color = "var(--text-main)";
+                feedbackAlert.innerText = "Input syntax matching alignment layer grid.";
+                accuracyGauge.innerText = "Accuracy: 0%";
+                return;
+            }
+
+            let perfectMatches = 0;
+            for (let i = 0; i < userInput.length; i++) {
+                if (userInput[i] === targetPattern[i]) perfectMatches++;
+            }
+            const matchPercentage = Math.round((perfectMatches / Math.max(userInput.length, targetPattern.length)) * 100);
+            accuracyGauge.innerText = `Accuracy: ${matchPercentage}%`;
+
+            if (targetPattern.startsWith(userInput)) {
+                if (userInput === targetPattern) {
+                    feedbackAlert.style.color = "var(--cyan-glow)";
+                    feedbackAlert.innerText = "✓ SYNTAX MATRIX MATCHES PERFECTLY. SUBMIT LOGIC TO RUNTIME ENGINE.";
+                } else {
+                    feedbackAlert.style.color = "var(--gold-classic)";
+                    feedbackAlert.innerText = "⚡ Logic synchronization accurate... continue typing.";
+                }
+            } else {
+                feedbackAlert.style.color = "#ff5555";
+                feedbackAlert.innerText = "❌ DETECTED LOGIC DEVIATION. Verify formatting, characters, or indentations.";
+            }
+        }
+
+        /* --- CLIENT-SIDE PYTHON ENVIRONMENT SIMULATOR --- */
+        function executePythonMock() {
+            const currentInput = document.getElementById("editor-input").value;
+            const expectedPattern = BEGINNER_FORTY_MATRICES[activeLessonIndex].code;
+            const term = document.getElementById("terminal-screen");
+
+            term.innerHTML = ">>> Initializing localized Python Virtual Instance...<br>";
+
+            setTimeout(() => {
+                if (currentInput.trim() === expectedPattern.trim()) {
+                    if (currentInput.includes("print(")) {
+                        const messageExtract = currentInput.match(/print\((["'])(.*?)\1\)/);
+                        const outputStr = messageExtract ? messageExtract[2] : "Process returned exit code 0";
+                        term.innerHTML += `>>> Running script...<br><span style='color: #6ee7b7;'>${outputStr}</span>`;
+                    } else if (currentInput.includes("total =")) {
+                        term.innerHTML += ">>> Running script...<br><span style='color: #6ee7b7;'>Variable 'total' allocated in namespace with evaluated value 75.</span>";
+                    } else if (currentInput.includes("accuracy =")) {
+                        term.innerHTML += ">>> Running script...<br><span style='color: #6ee7b7;'>Variable 'accuracy' bounded to value 0.98.</span>";
+                    } else {
+                        term.innerHTML += ">>> Running script...<br><span style='color: #6ee7b7;'>Execution successful. Memory cleaned. Process returned exit code 0.</span>";
+                    }
+                } else {
+                    term.innerHTML += ">>> Running script...<br><span style='color: #f87171;'>SyntaxError: Invalid or incomplete token arrangement in structure block. Matrix rejected.</span>";
+                }
+            }, 600);
+        }
+
+        /* --- GROQ API INTEGRATION SYSTEM --- */
+        function requestGroqAIHelp() {
+            const userQueryText = document.getElementById("ai-user-query").value;
+            const activeCodeFragment = document.getElementById("editor-input").value;
+            const activeLessonData = BEGINNER_FORTY_MATRICES[activeLessonIndex];
+            const aiResponseContainer = document.getElementById("ai-reply-area");
+
+            if (!userQueryText.trim()) {
+                aiResponseContainer.innerText = "System Warning: Please specify an explicit question within the data portal before initialization.";
+                return;
+            }
+
+            aiResponseContainer.innerText = "⏳ Synchronizing over cloud relays to Groq AI Processing Unit...";
+
+            // Direct API calls targeting Groq standard OpenAI-compatible server architecture
+            fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer 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"
+                },
+                body: JSON.stringify({
+                    model: "llama3-8b-8192",
+                    messages: [
+                        {
+                            role: "system",
+                            content: "You are the advanced Python Guru assistant. Provide straight, hyper-focused, code-correct explanations to beginners. Avoid fluff or extended text formats. Keep explanations concise."
+                        },
+                        {
+                            role: "user",
+                            content: `I am stuck on the lesson titled: "${activeLessonData.title}".\nDescription: "${activeLessonData.desc}".\nMy current code workspace input is:\n\`\`\`python\n${activeCodeFragment}\n\`\`\`\n\nQuestion: "${userQueryText}"`
+                        }
+                    ],
+                    temperature: 0.3
+                })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP network anomaly detected. Code status: ${res.status}`);
+                return res.json();
+            })
+            .then(payload => {
+                const generatedReply = payload.choices[0].message.content;
+                aiResponseContainer.innerText = generatedReply;
+            })
+            .catch(error => {
+                console.error(error);
+                aiResponseContainer.innerText = "⚠️ Cloud Relays Failed. Check network layers, ensure no active firewalls block client-side requests to Groq, or verify token allocations.";
+            });
+        }
+    </script>
+</body>
+</html>
