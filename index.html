@@ -37,6 +37,10 @@
             transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
         }
 
+        #matrix-canvas {
+            position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+        }
+
         #hologram-canvas {
             position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;
         }
@@ -266,12 +270,12 @@
 <body>
 
     <div id="landing-portal-wrapper">
+        <canvas id="matrix-canvas"></canvas>
         <canvas id="hologram-canvas"></canvas>
         
         <div class="portal-top-bar">
             <div class="portal-logo-badge">PYTHON GURU</div>
             <div class="portal-system-status">
-                <span style="cursor:pointer; color: #cbd5e1; transition: color 0.2s;" id="landing-audio-action">▶ Initialize Core Ambience</span>
                 <div class="status-pill">
                     <div class="status-dot"></div>
                     <span>Local WebAssembly Interpreter Engine...</span>
@@ -295,7 +299,7 @@
         <header class="global-header-navigation">
             <div class="workspace-branding-title">PYTHON GURU</div>
             <div class="system-telemetry-cluster">
-                <button class="action-icon-button" id="workspace-audio-action">▶ Play Audio</button>
+                <button class="action-icon-button" id="workspace-audio-action">▶ Play Music</button>
                 <div class="engine-telemetry-readout" id="engine-runtime-telemetry">Python Core: Initializing Engine...</div>
             </div>
         </header>
@@ -303,7 +307,7 @@
         <main class="workspace-split-matrix">
             <aside class="curriculum-manifest-sidebar">
                 <h3 class="sidebar-section-heading">Training Curriculum</h3>
-                </aside>
+            </aside>
 
             <section class="source-compilation-studio">
                 <div class="editor-workspace-canvas">
@@ -318,8 +322,7 @@
                 <div class="coprocessor-header">
                     <h3 class="coprocessor-title-label">AI Coprocessor</h3>
                 </div>
-                <div class="transmission-log-view" id="ai-transmission-stream">
-                    </div>
+                <div class="transmission-log-view" id="ai-transmission-stream"></div>
                 <div class="interactive-input-dock">
                     <textarea class="coprocessor-input-field" id="ai-user-query-input" placeholder="Query the coprocessor network..."></textarea>
                     <button class="coprocessor-dispatch-trigger" id="btn-trigger-ai-fetch">Transmit Query</button>
@@ -333,10 +336,60 @@
     </audio>
 
     <script>
-        // --- 3D PROJECTOR HOLOGRAM BACKGROUND CORE ENGINE ---
+        // --- 1. LIVE FLOATING CODE MATRIX RAIN BACKGROUND ENGINE ---
+        const matrixCanvas = document.getElementById('matrix-canvas');
+        const mCtx = matrixCanvas.getContext('2d');
+        let mWidth = matrixCanvas.width = window.innerWidth;
+        let mHeight = matrixCanvas.height = window.innerHeight;
+
+        const pythonCodePool = [
+            "import sys, os", "def initialize_core():", "print('Matrix Online')", 
+            "yield data_stream", "class CodeMatrixEngine:", "while True:", 
+            "return WebAssembly", "sys.setrecursionlimit(5000)", "lambda frame: frame * 2", 
+            "groq_coprocessor.fetch()", "connect_ai_nodes()", "milestones = Array()",
+            "await core.runAsync()", "for token in stream:", "if status == 'ACTIVE':"
+        ];
+        
+        const columnWidth = 100; 
+        const columnsCount = Math.floor(mWidth / columnWidth) + 1;
+        const matrixDropsY = [];
+        const dynamicStringsArray = [];
+        const streamSpeeds = [];
+
+        for (let i = 0; i < columnsCount; i++) {
+            matrixDropsY[i] = Math.random() * -600; 
+            dynamicStringsArray[i] = pythonCodePool[Math.floor(Math.random() * pythonCodePool.length)];
+            streamSpeeds[i] = 0.8 + Math.random() * 1.8;
+        }
+
+        window.addEventListener('resize', () => {
+            mWidth = matrixCanvas.width = window.innerWidth;
+            mHeight = matrixCanvas.height = window.innerHeight;
+        });
+
+        function renderMatrixCodeRain() {
+            mCtx.fillStyle = 'rgba(6, 8, 17, 0.06)'; 
+            mCtx.fillRect(0, 0, mWidth, mHeight);
+
+            mCtx.fillStyle = 'rgba(0, 229, 255, 0.12)'; 
+            mCtx.font = "11px 'JetBrains Mono', monospace";
+
+            for (let i = 0; i < matrixDropsY.length; i++) {
+                mCtx.fillText(dynamicStringsArray[i], i * columnWidth, matrixDropsY[i]);
+                matrixDropsY[i] += streamSpeeds[i];
+
+                if (matrixDropsY[i] > mHeight + 30) {
+                    matrixDropsY[i] = -30;
+                    dynamicStringsArray[i] = pythonCodePool[Math.floor(Math.random() * pythonCodePool.length)];
+                    streamSpeeds[i] = 0.8 + Math.random() * 1.8;
+                }
+            }
+        }
+
+
+        // --- 2. 3D PROJECTOR HOLOGRAM BACKGROUND ENGINE ---
         const canvas = document.getElementById('hologram-canvas');
         const ctx = canvas.getContext('2d');
-
         let width = canvas.width = window.innerWidth;
         let height = canvas.height = window.innerHeight;
 
@@ -345,9 +398,8 @@
             height = canvas.height = window.innerHeight;
         });
 
-        // 3D Projection Math Points
         let points = [];
-        const numPoints = 12; // Dodecahedron approximation vertex cluster
+        const numPoints = 12; 
         for (let i = 0; i < numPoints; i++) {
             let lat = Math.acos(-1 + (2 * i) / numPoints);
             let lon = Math.sqrt(numPoints * Math.PI) * lat;
@@ -358,8 +410,8 @@
             });
         }
 
-        let angleX = 0.003;
-        let angleY = 0.005;
+        let angleX = 0.002;
+        let angleY = 0.004;
 
         function project3D(x, y, z) {
             let fov = 380;
@@ -374,11 +426,9 @@
         function drawHologramEngine() {
             ctx.clearRect(0, 0, width, height);
 
-            // Render Cyber Gothic Arches Flanking Borders
-            ctx.strokeStyle = 'rgba(0, 229, 255, 0.06)';
+            ctx.strokeStyle = 'rgba(0, 229, 255, 0.05)';
             ctx.lineWidth = 2;
             
-            // Left Arch
             ctx.beginPath();
             ctx.moveTo(width * 0.15, height);
             ctx.lineTo(width * 0.15, height * 0.4);
@@ -386,7 +436,6 @@
             ctx.lineTo(width * 0.25, height);
             ctx.stroke();
 
-            // Right Arch
             ctx.beginPath();
             ctx.moveTo(width * 0.75, height);
             ctx.lineTo(width * 0.75, height * 0.4);
@@ -394,7 +443,6 @@
             ctx.lineTo(width * 0.85, height);
             ctx.stroke();
 
-            // Rotate 3D Mathematical Array Coordinates
             points.forEach(p => {
                 let cosX = Math.cos(angleX), sinX = Math.sin(angleX);
                 let cosY = Math.cos(angleY), sinY = Math.sin(angleY);
@@ -408,9 +456,8 @@
                 p.x = x2; p.z = z2;
             });
 
-            // Draw Connected Structural Blueprints
             let projected = points.map(p => project3D(p.x, p.y, p.z));
-            ctx.strokeStyle = 'rgba(0, 229, 255, 0.18)';
+            ctx.strokeStyle = 'rgba(0, 229, 255, 0.16)';
             ctx.lineWidth = 1;
 
             for (let i = 0; i < projected.length; i++) {
@@ -425,7 +472,6 @@
                 }
             }
 
-            // Draw Vertices Nodes Glow
             projected.forEach(p => {
                 ctx.fillStyle = `rgba(0, 229, 255, ${0.4 * p.scale})`;
                 ctx.shadowBlur = 12;
@@ -433,14 +479,20 @@
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, 4 * p.scale, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.shadowBlur = 0; // reset
+                ctx.shadowBlur = 0;
             });
-
-            requestAnimationFrame(drawHologramEngine);
         }
-        drawHologramEngine();
 
-        // --- CORE APPLICATION ENGINE LINKED FUNCTIONALITIES ---
+        // Integrated Master Animation Frame Handler
+        function pipelineMasterLoop() {
+            renderMatrixCodeRain();
+            drawHologramEngine();
+            requestAnimationFrame(pipelineMasterLoop);
+        }
+        pipelineMasterLoop();
+
+
+        // --- 3. CORE APPLICATION ENGINE LINKED FUNCTIONALITIES ---
         let executionCoreInstance = null;
         let ambientAudioPlaying = false;
 
@@ -472,7 +524,7 @@
             const scriptPayload = document.getElementById("code-input-area").value;
             try {
                 let executionFeedbackResult = await executionCoreInstance.runPythonAsync(scriptPayload);
-                if (executionFeedbackResult === undefined) executionFeedbackResult = "Script parsed and processed successfully with no implicit feedback arrays.";
+                if (executionFeedbackResult === undefined) executionFeedbackResult = "Script parsed successfully with no output feedback arrays.";
                 alert("Compilation Studio Output Telemetry:\n\n" + executionFeedbackResult);
             } catch (executionFaultException) {
                 alert("Runtime Engine Standard Fault Alert:\n\n" + executionFaultException.message);
@@ -533,40 +585,29 @@
             const portalFrameLayer = document.getElementById("landing-portal-wrapper");
             const triggerEnterButton = document.getElementById("btn-enter-academy-portal");
             const globalAudioMediaResource = document.getElementById("ambient-audio-resource");
-            const btnLandingAudio = document.getElementById("landing-audio-action");
             const btnWorkspaceAudio = document.getElementById("workspace-audio-action");
 
-            // Portal transition mechanics
             triggerEnterButton.addEventListener("click", () => {
                 portalFrameLayer.style.opacity = "0";
                 portalFrameLayer.style.visibility = "hidden";
             });
 
-            // Master Synchronized Audio Toggle Engine
             function switchAudioPlaybackState() {
                 if (!ambientAudioPlaying) {
-                    globalAudioMediaResource.play().catch(err => console.log("Media node blocked by platform parameters. Interaction required."));
-                    btnLandingAudio.innerText = "⏸ Pause Core Ambience";
-                    btnWorkspaceAudio.innerText = "⏸ Pause Audio";
+                    globalAudioMediaResource.play().catch(err => console.log("Media engine blocked. Interaction required."));
+                    btnWorkspaceAudio.innerText = "⏸ Pause Music";
                     ambientAudioPlaying = true;
                 } else {
                     globalAudioMediaResource.pause();
-                    btnLandingAudio.innerText = "▶ Initialize Core Ambience";
-                    btnWorkspaceAudio.innerText = "▶ Play Audio";
+                    btnWorkspaceAudio.innerText = "▶ Play Music";
                     ambientAudioPlaying = false;
                 }
             }
 
-            btnLandingAudio.addEventListener("click", switchAudioPlaybackState);
             btnWorkspaceAudio.addEventListener("click", switchAudioPlaybackState);
-
-            // Execution Trigger Commands
             document.getElementById("btn-execute-source").addEventListener("click", runSourceCodeExecution);
-
-            // AI Coprocessor Query Actions
             document.getElementById("btn-trigger-ai-fetch").addEventListener("click", queryGroqCoprocessor);
 
-            // Tab Key Capture Indentation Engine
             const sourceCodeTextarea = document.getElementById("code-input-area");
             sourceCodeTextarea.addEventListener("keydown", function(eventKey) {
                 if (eventKey.key === "Tab") {
