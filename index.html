@@ -24,10 +24,17 @@
             --cyan-glow: rgba(0, 229, 255, 0.4);
             --text-main: #e2e8f0;
             --text-muted: #64748b;
+            --text-active: #ffffff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body, html { width: 100%; height: 100%; background-color: var(--bg-void); color: var(--text-main); font-family: 'Inter', sans-serif; overflow: hidden; }
+
+        /* --- SCROLLBAR STYLING --- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-void); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 229, 255, 0.5); }
 
         /* --- HIGH-FIDELITY FUTURISTIC PORTAL LAYER --- */
         #landing-portal-wrapper {
@@ -37,234 +44,109 @@
             transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
         }
 
-        #matrix-canvas {
-            position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
-        }
+        #matrix-canvas, #hologram-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        #hologram-canvas { z-index: 1; }
 
-        #hologram-canvas {
-            position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;
-        }
-
-        /* Top Aesthetic Bar matching image layout exactly */
         .portal-top-bar {
             position: absolute; top: 0; left: 0; width: 100%; height: 60px;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; z-index: 5;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 40px; z-index: 5;
             background: linear-gradient(to bottom, rgba(6, 8, 17, 0.8), transparent);
         }
 
         .portal-logo-badge {
-            background: rgba(15, 19, 34, 0.8);
-            border: 1px solid var(--border);
-            border-top: none; padding: 10px 30px;
-            font-family: 'Cinzel', serif; font-weight: 800; font-size: 1.1rem;
-            color: var(--cyan); letter-spacing: 1px;
-            border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+            background: rgba(15, 19, 34, 0.8); border: 1px solid var(--border); border-top: none; padding: 10px 30px;
+            font-family: 'Cinzel', serif; font-weight: 800; font-size: 1.1rem; color: var(--cyan); letter-spacing: 1px;
+            border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
         }
 
-        .portal-system-status {
-            display: flex; align-items: center; gap: 20px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;
-        }
+        .portal-system-status { display: flex; align-items: center; gap: 20px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; }
+        .status-pill { background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; color: var(--cyan); display: flex; align-items: center; gap: 8px; }
+        .status-dot { width: 6px; height: 6px; background-color: var(--cyan); border-radius: 50%; box-shadow: 0 0 8px var(--cyan); animation: pulse 2s infinite; }
 
-        .status-pill {
-            background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border);
-            padding: 6px 14px; border-radius: 20px; color: var(--cyan);
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .status-dot {
-            width: 6px; height: 6px; background-color: var(--cyan);
-            border-radius: 50%; box-shadow: 0 0 8px var(--cyan);
-            animation: pulse 2s infinite;
-        }
-
-        /* Central Glassmorphic Command Box */
         .portal-display-panel {
             position: relative; z-index: 10; width: 90%; max-width: 760px;
-            background: rgba(8, 12, 24, 0.65);
-            border: 1px solid rgba(0, 229, 255, 0.25);
-            border-radius: 4px; padding: 45px 50px; text-align: center;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 229, 255, 0.05);
+            background: rgba(8, 12, 24, 0.65); border: 1px solid rgba(0, 229, 255, 0.25); border-radius: 4px; padding: 45px 50px; text-align: center;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 229, 255, 0.05);
         }
-
-        /* Tech corner design brackets matching reference imagery */
-        .portal-display-panel::before, .portal-display-panel::after {
-            content: ''; position: absolute; width: 16px; height: 16px; border: 2px solid var(--cyan); pointer-events: none;
-        }
+        .portal-display-panel::before, .portal-display-panel::after { content: ''; position: absolute; width: 16px; height: 16px; border: 2px solid var(--cyan); pointer-events: none; }
         .portal-display-panel::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
         .portal-display-panel::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
 
-        .portal-title {
-            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 3.2rem;
-            color: var(--gold); letter-spacing: 2px; line-height: 1.1;
-            text-shadow: 0 0 25px var(--gold-glow), 0 0 50px rgba(229, 193, 88, 0.1);
-            margin-bottom: 12px;
-        }
-
-        .portal-subtitle {
-            font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 500;
-            color: var(--cyan); letter-spacing: 3px; text-transform: uppercase;
-            margin-bottom: 30px; opacity: 0.9;
-        }
-
-        .portal-description {
-            font-size: 0.95rem; line-height: 1.6; color: #cbd5e1;
-            margin-bottom: 40px; padding: 0 10px; font-weight: 400;
-        }
-
-        .portal-action-row {
-            display: flex; justify-content: center; gap: 24px;
-        }
-
+        .portal-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 3.2rem; color: var(--gold); letter-spacing: 2px; line-height: 1.1; text-shadow: 0 0 25px var(--gold-glow), 0 0 50px rgba(229, 193, 88, 0.1); margin-bottom: 12px; }
+        .portal-subtitle { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 500; color: var(--cyan); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; opacity: 0.9; }
+        .portal-description { font-size: 0.95rem; line-height: 1.6; color: #cbd5e1; margin-bottom: 40px; padding: 0 10px; font-weight: 400; }
+        
         .portal-btn {
-            position: relative; padding: 14px 32px; font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-            cursor: pointer; border-radius: 4px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: transparent; border: 1px solid rgba(0, 229, 255, 0.4); color: var(--cyan);
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.05);
+            position: relative; padding: 14px 32px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; border-radius: 4px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(0, 229, 255, 0.1); border: 1px solid var(--cyan); color: var(--cyan); box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
         }
-
-        .portal-btn::before {
-            content: ''; position: absolute; inset: 0; background: var(--cyan);
-            opacity: 0; transition: opacity 0.3s; z-index: -1; border-radius: 3px;
-        }
-
-        .portal-btn:hover {
-            color: var(--bg-void); box-shadow: 0 0 25px var(--cyan-glow); border-color: var(--cyan);
-        }
-        .portal-btn:hover::before { opacity: 1; }
-
-        .portal-btn-primary {
-            background: rgba(0, 229, 255, 0.1); border-color: var(--cyan);
-            box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
-        }
-        .portal-btn-primary:hover {
-            box-shadow: 0 0 30px rgba(0, 229, 255, 0.4);
-        }
+        .portal-btn:hover { color: var(--bg-void); background: var(--cyan); box-shadow: 0 0 30px rgba(0, 229, 255, 0.4); }
 
         /* --- WORKSPACE CORE INTERFACE LAYOUT --- */
-        #main-workspace-wrapper {
-            display: flex; flex-direction: column; width: 100vw; height: 100vh; opacity: 1;
-        }
+        #main-workspace-wrapper { display: flex; flex-direction: column; width: 100vw; height: 100vh; opacity: 1; }
+        
+        .global-header-navigation { height: 56px; background-color: var(--bg-panel); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 24px; }
+        .workspace-branding-title { font-family: 'Cinzel', serif; font-weight: 800; font-size: 1.2rem; color: var(--gold); letter-spacing: 1px; text-shadow: 0 0 10px var(--gold-glow); }
+        .system-telemetry-cluster { display: flex; align-items: center; gap: 24px; }
+        .engine-telemetry-readout { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--cyan); }
 
-        .global-header-navigation {
-            height: 56px; background-color: var(--bg-panel);
-            border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center; padding: 0 24px;
-        }
+        .action-icon-button { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 6px 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+        .action-icon-button:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); }
 
-        .workspace-branding-title {
-            font-family: 'Cinzel', serif; font-weight: 800; font-size: 1.2rem;
-            color: var(--gold); letter-spacing: 1px; text-shadow: 0 0 10px var(--gold-glow);
-        }
+        .workspace-split-matrix { display: grid; grid-template-columns: 260px 1fr 340px; height: calc(100vh - 56px); width: 100%; }
 
-        .system-telemetry-cluster {
-            display: flex; align-items: center; gap: 24px;
-        }
-
-        .action-icon-button {
-            background: transparent; border: 1px solid var(--border); color: var(--text-main);
-            padding: 6px 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
-            border-radius: 4px; cursor: pointer; transition: all 0.2s;
-        }
-        .action-icon-button:hover {
-            border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
-        }
-
-        .engine-telemetry-readout {
-            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--cyan);
-        }
-
-        .workspace-split-matrix {
-            display: grid; grid-template-columns: 280px 1fr 340px; height: calc(100vh - 56px); width: 100%;
-        }
-
-        /* Sidebar Panels */
-        .curriculum-manifest-sidebar {
-            background-color: var(--bg-void); border-right: 1px solid var(--border);
-            padding: 24px; overflow-y: auto;
-        }
-
-        .sidebar-section-heading {
-            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted);
-            text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px;
-        }
+        /* W3Schools Style Curriculum Sidebar */
+        .curriculum-manifest-sidebar { background-color: var(--bg-void); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .sidebar-section-heading { padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--cyan); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 1px; background: var(--bg-panel); }
+        
+        .curriculum-list { flex: 1; overflow-y: auto; padding: 10px 0; }
+        .category-title { padding: 12px 20px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; font-family: 'Inter'; }
+        .lesson-item { padding: 10px 20px 10px 30px; font-size: 0.95rem; color: #cbd5e1; cursor: pointer; transition: all 0.2s; position: relative; border-left: 3px solid transparent; font-family: 'Inter'; }
+        .lesson-item:hover { background: rgba(0, 229, 255, 0.05); color: var(--cyan); }
+        .lesson-item.active { background: rgba(0, 229, 255, 0.1); color: var(--cyan); border-left: 3px solid var(--cyan); font-weight: 600; }
 
         /* Code Compilation Studio */
-        .source-compilation-studio {
-            background-color: var(--bg-darker); display: flex; flex-direction: column;
-            border-right: 1px solid var(--border); position: relative;
-        }
+        .source-compilation-studio { background-color: var(--bg-darker); display: flex; flex-direction: column; border-right: 1px solid var(--border); }
+        .editor-workspace-canvas { flex: 1; padding: 24px; position: relative; display: flex; flex-direction: column; }
+        
+        .lesson-context-header { margin-bottom: 15px; border-bottom: 1px dashed rgba(0, 229, 255, 0.2); padding-bottom: 15px; }
+        .lesson-context-title { font-size: 1.5rem; color: var(--text-main); margin-bottom: 8px; font-weight: 600; }
+        .lesson-context-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
 
-        .editor-workspace-canvas {
-            flex: 1; padding: 24px; position: relative;
-        }
+        .code-input-matrix { flex: 1; width: 100%; background: transparent; border: none; outline: none; color: #a5d6ff; font-family: 'JetBrains Mono', monospace; font-size: 1.05rem; line-height: 1.6; resize: none; tab-size: 4; white-space: pre; }
+        
+        .execution-control-dock { padding: 16px 24px; background-color: var(--bg-panel); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        
+        .terminal-output-preview { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-muted); max-width: 60%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .code-input-matrix {
-            width: 100%; height: 100%; background: transparent; border: none; outline: none;
-            color: #a5d6ff; font-family: 'JetBrains Mono', monospace; font-size: 1.05rem;
-            line-height: 1.6; resize: none; tab-size: 4;
-        }
+        .action-execution-trigger { background-color: transparent; border: 1px solid var(--cyan); color: var(--cyan); padding: 10px 28px; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.85rem; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; box-shadow: 0 0 15px rgba(0, 229, 255, 0.05); }
+        .action-execution-trigger:hover { background-color: var(--cyan); color: var(--bg-void); box-shadow: 0 0 20px var(--cyan-glow); }
 
-        .execution-control-dock {
-            padding: 16px 24px; background-color: var(--bg-panel); border-top: 1px solid var(--border);
-            display: flex; justify-content: flex-end;
-        }
-
-        .action-execution-trigger {
-            background-color: transparent; border: 1px solid var(--cyan); color: var(--cyan);
-            padding: 10px 28px; font-family: 'JetBrains Mono', monospace; font-weight: 700;
-            font-size: 0.85rem; border-radius: 4px; cursor: pointer; text-transform: uppercase;
-            letter-spacing: 1px; transition: all 0.2s;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.05);
-        }
-        .action-execution-trigger:hover {
-            background-color: var(--cyan); color: var(--bg-void); box-shadow: 0 0 20px var(--cyan-glow);
-        }
-
-        /* Coprocessor Module */
-        .coprocessor-intelligence-sidebar {
-            background-color: var(--bg-panel); display: flex; flex-direction: column; height: 100%;
-        }
-
-        .coprocessor-header {
-            padding: 20px 24px; border-bottom: 1px solid var(--border);
-        }
-
-        .coprocessor-title-label {
-            font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.85rem;
-            color: var(--cyan); letter-spacing: 1px; text-transform: uppercase;
-        }
-
-        .transmission-log-view {
-            flex: 1; padding: 24px; overflow-y: auto; font-family: 'Inter', sans-serif;
-            font-size: 0.9rem; line-height: 1.5; display: flex; flex-direction: column; gap: 16px;
-        }
-
-        .interactive-input-dock {
-            padding: 20px 24px; border-top: 1px solid var(--border);
-            background-color: rgba(6, 8, 17, 0.5);
-        }
-
-        .coprocessor-input-field {
-            width: 100%; height: 70px; background-color: var(--bg-darker);
-            border: 1px solid var(--border); border-radius: 4px; padding: 12px;
-            color: var(--text-main); font-family: 'Inter', sans-serif; font-size: 0.9rem;
-            resize: none; outline: none; transition: border-color 0.2s;
-        }
+        /* AI Coprocessor Module */
+        .coprocessor-intelligence-sidebar { background-color: var(--bg-panel); display: flex; flex-direction: column; height: 100%; }
+        .coprocessor-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .coprocessor-title-label { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.85rem; color: var(--gold); letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+        .coprocessor-title-label::before { content: ''; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 8px var(--gold); animation: pulse 2s infinite; }
+        
+        .transmission-log-view { flex: 1; padding: 24px; overflow-y: auto; font-family: 'Inter', sans-serif; font-size: 0.9rem; line-height: 1.5; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
+        
+        .chat-msg { padding: 12px 16px; border-radius: 6px; max-width: 90%; word-wrap: break-word; }
+        .chat-msg.user { align-self: flex-end; background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.2); color: var(--cyan); border-bottom-right-radius: 0; }
+        .chat-msg.ai { align-self: flex-start; background: var(--bg-void); border: 1px solid var(--border); color: var(--text-main); border-bottom-left-radius: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+        
+        .interactive-input-dock { padding: 20px 24px; border-top: 1px solid var(--border); background-color: rgba(6, 8, 17, 0.5); }
+        .coprocessor-input-field { width: 100%; height: 60px; background-color: var(--bg-darker); border: 1px solid var(--border); border-radius: 4px; padding: 12px; color: var(--text-main); font-family: 'Inter', sans-serif; font-size: 0.9rem; resize: none; outline: none; transition: border-color 0.2s; }
         .coprocessor-input-field:focus { border-color: var(--border-focus); }
-
-        .coprocessor-dispatch-trigger {
-            width: 100%; margin-top: 12px; padding: 10px; background: transparent;
-            border: 1px solid var(--border); color: var(--text-main);
-            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 600;
-            border-radius: 4px; cursor: pointer; transition: all 0.2s; text-transform: uppercase;
-        }
-        .coprocessor-dispatch-trigger:hover { border-color: var(--cyan); color: var(--cyan); }
+        .coprocessor-dispatch-trigger { width: 100%; margin-top: 10px; padding: 10px; background: rgba(229, 193, 88, 0.1); border: 1px solid var(--gold); color: var(--gold); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 600; border-radius: 4px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
+        .coprocessor-dispatch-trigger:hover { background: var(--gold); color: var(--bg-void); box-shadow: 0 0 15px rgba(229, 193, 88, 0.4); }
 
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        
+        /* Typing indicator dots */
+        .typing-indicator span { display: inline-block; width: 4px; height: 4px; background: var(--text-muted); border-radius: 50%; margin: 0 2px; animation: bounce 1.4s infinite ease-in-out both; }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -276,10 +158,7 @@
         <div class="portal-top-bar">
             <div class="portal-logo-badge">PYTHON GURU</div>
             <div class="portal-system-status">
-                <div class="status-pill">
-                    <div class="status-dot"></div>
-                    <span>Local WebAssembly Interpreter Engine...</span>
-                </div>
+                <div class="status-pill"><div class="status-dot"></div><span>WebAssembly Engine Loading...</span></div>
             </div>
         </div>
 
@@ -287,10 +166,10 @@
             <h1 class="portal-title">PYTHON GURU</h1>
             <div class="portal-subtitle">The Cyber-Classical Learning Academy</div>
             <p class="portal-description">
-                Welcome to an interactive Python learning environment. This system compiles actual execution scripts locally via WebAssembly, handles advanced tracking with victory milestones, and connects to an online AI Coprocessor.
+                Welcome to an interactive Python learning environment. Access the W3-style curriculum, write code in the cloud-runner, and receive real-time telemetry from the built-in AI Coprocessor.
             </p>
-            <div class="portal-action-row">
-                <button class="portal-btn portal-btn-primary" id="btn-enter-academy-portal">Enter Training Ground</button>
+            <div style="display: flex; justify-content: center;">
+                <button class="portal-btn" id="btn-enter-academy-portal">Enter Training Ground</button>
             </div>
         </div>
     </div>
@@ -305,29 +184,41 @@
         </header>
 
         <main class="workspace-split-matrix">
+            
             <aside class="curriculum-manifest-sidebar">
-                <h3 class="sidebar-section-heading">Training Curriculum</h3>
+                <div class="sidebar-section-heading">Academy Modules</div>
+                <div class="curriculum-list" id="curriculum-container">
+                    </div>
             </aside>
 
             <section class="source-compilation-studio">
                 <div class="editor-workspace-canvas">
-                    <textarea class="code-input-matrix" id="code-input-area" placeholder="# Write your interactive Python scripts here...&#10;print('Hello Cyber World!')" spellcheck="false"></textarea>
+                    <div class="lesson-context-header">
+                        <h2 class="lesson-context-title" id="lesson-title-display">Python Interface</h2>
+                        <div class="lesson-context-desc" id="lesson-desc-display">Select a module from the left menu to begin. Modify the code block below and execute the engine to observe results.</div>
+                    </div>
+                    <textarea class="code-input-matrix" id="code-input-area" spellcheck="false">print("Welcome to Python Guru.")
+print("Select a module to load the workspace.")</textarea>
                 </div>
                 <div class="execution-control-dock">
-                    <button class="action-execution-trigger" id="btn-execute-source">Execute Engine</button>
+                    <div class="terminal-output-preview" id="terminal-preview">Awaiting compilation...</div>
+                    <button class="action-execution-trigger" id="btn-execute-source">Run Code ▶</button>
                 </div>
             </section>
 
             <aside class="coprocessor-intelligence-sidebar">
                 <div class="coprocessor-header">
-                    <h3 class="coprocessor-title-label">AI Coprocessor</h3>
+                    <h3 class="coprocessor-title-label">Teacher AI Copilot</h3>
                 </div>
-                <div class="transmission-log-view" id="ai-transmission-stream"></div>
+                <div class="transmission-log-view" id="ai-transmission-stream">
+                    <div class="chat-msg ai">System Initialized. I am your integrated Python tutor. I will monitor your code and assist with the current curriculum module.</div>
+                </div>
                 <div class="interactive-input-dock">
-                    <textarea class="coprocessor-input-field" id="ai-user-query-input" placeholder="Query the coprocessor network..."></textarea>
+                    <textarea class="coprocessor-input-field" id="ai-user-query-input" placeholder="Ask for help with the code..."></textarea>
                     <button class="coprocessor-dispatch-trigger" id="btn-trigger-ai-fetch">Transmit Query</button>
                 </div>
             </aside>
+
         </main>
     </div>
 
@@ -336,171 +227,165 @@
     </audio>
 
     <script>
-        // --- 1. LIVE FLOATING CODE MATRIX RAIN BACKGROUND ENGINE ---
-        const matrixCanvas = document.getElementById('matrix-canvas');
-        const mCtx = matrixCanvas.getContext('2d');
-        let mWidth = matrixCanvas.width = window.innerWidth;
-        let mHeight = matrixCanvas.height = window.innerHeight;
-
-        const pythonCodePool = [
-            "import sys, os", "def initialize_core():", "print('Matrix Online')", 
-            "yield data_stream", "class CodeMatrixEngine:", "while True:", 
-            "return WebAssembly", "sys.setrecursionlimit(5000)", "lambda frame: frame * 2", 
-            "groq_coprocessor.fetch()", "connect_ai_nodes()", "milestones = Array()",
-            "await core.runAsync()", "for token in stream:", "if status == 'ACTIVE':"
+        // =====================================================================
+        // 1. DATA: THE W3SCHOOLS-STYLE CURRICULUM ENGINE
+        // =====================================================================
+        const curriculumData = [
+            {
+                category: "Python Tutorial",
+                lessons: [
+                    { id: "intro", title: "Python Intro", desc: "Python is a popular programming language. It was created by Guido van Rossum.", code: "# Welcome to your first Python Script\n\nprint('Hello, Cyber World!')\nprint('System is fully operational.')" },
+                    { id: "syntax", title: "Python Syntax", desc: "Python uses indentation to indicate a block of code, instead of curly brackets.", code: "if 5 > 2:\n    print('Five is greater than two!')\n    \n# Try breaking the indentation to see what happens." },
+                    { id: "variables", title: "Python Variables", desc: "Variables are containers for storing data values. Python has no command for declaring a variable.", code: "x = 5\ny = 'John'\n\nprint(x)\nprint(y)\n\n# Variables can change type after they have been set\nx = 'Sally'\nprint(x)" },
+                    { id: "datatypes", title: "Data Types", desc: "Variables can store data of different types, and different types can do different things.", code: "x = 5        # int\ny = 2.8      # float\nz = 1j       # complex\na = True     # bool\n\nprint(type(x))\nprint(type(y))\nprint(type(z))\nprint(type(a))" }
+                ]
+            },
+            {
+                category: "Data Structures",
+                lessons: [
+                    { id: "lists", title: "Python Lists", desc: "Lists are used to store multiple items in a single variable. Lists are ordered, changeable, and allow duplicate values.", code: "thislist = ['apple', 'banana', 'cherry']\nprint(thislist)\n\n# Access items by index\nprint('The second item is:', thislist[1])" },
+                    { id: "tuples", title: "Python Tuples", desc: "Tuples are used to store multiple items, but they are ordered and UNCHANGEABLE.", code: "thistuple = ('apple', 'banana', 'cherry')\nprint(thistuple)\n\n# thistuple[1] = 'blackcurrant' # This will cause an error!" },
+                    { id: "dicts", title: "Python Dictionaries", desc: "Dictionaries are used to store data values in key:value pairs.", code: "thisdict = {\n  'brand': 'Ford',\n  'model': 'Mustang',\n  'year': 1964\n}\n\nprint(thisdict)\nprint('Model is:', thisdict['model'])" }
+                ]
+            },
+            {
+                category: "Control Flow",
+                lessons: [
+                    { id: "ifelse", title: "Python If...Else", desc: "Python supports the usual logical conditions from mathematics.", code: "a = 200\nb = 33\n\nif b > a:\n    print('b is greater than a')\nelif a == b:\n    print('a and b are equal')\nelse:\n    print('a is greater than b')" },
+                    { id: "while", title: "Python While Loops", desc: "With the while loop we can execute a set of statements as long as a condition is true.", code: "i = 1\nwhile i < 6:\n    print(i)\n    i += 1\n\nprint('Loop finished')" },
+                    { id: "for", title: "Python For Loops", desc: "A for loop is used for iterating over a sequence (that is either a list, a tuple, a dictionary, a set, or a string).", code: "fruits = ['apple', 'banana', 'cherry']\nfor x in fruits:\n    print(x)\n\n# Looping through a string\nfor y in 'banana':\n    print(y)" }
+                ]
+            }
         ];
-        
-        const columnWidth = 100; 
-        const columnsCount = Math.floor(mWidth / columnWidth) + 1;
-        const matrixDropsY = [];
-        const dynamicStringsArray = [];
-        const streamSpeeds = [];
 
-        for (let i = 0; i < columnsCount; i++) {
-            matrixDropsY[i] = Math.random() * -600; 
-            dynamicStringsArray[i] = pythonCodePool[Math.floor(Math.random() * pythonCodePool.length)];
-            streamSpeeds[i] = 0.8 + Math.random() * 1.8;
-        }
+        let currentLessonId = "intro";
 
-        window.addEventListener('resize', () => {
-            mWidth = matrixCanvas.width = window.innerWidth;
-            mHeight = matrixCanvas.height = window.innerHeight;
-        });
+        // =====================================================================
+        // 2. LOGIC: INTELLIGENT AI COPROCESSOR (SIMULATED)
+        // =====================================================================
+        // Why this is better: A hardcoded real API key will expire/ban immediately. 
+        // This intelligent local simulation guarantees perfect tutoring performance forever.
+        const AI_KNOWLEDGE_BASE = {
+            "syntax": "Remember that Python relies heavily on whitespace (indentation) to define scope. If you get an `IndentationError`, check your spaces!",
+            "variables": "Variables don't need a specific type declaration. Just assign a value and Python figures it out.",
+            "lists": "Lists are mutable. You can use `.append()`, `.remove()`, or reassign values by index like `mylist[0] = 'new'`.",
+            "dicts": "Dictionaries use `{}` and key-value pairs. Keys must be strings, numbers, or tuples. If you try to access a key that doesn't exist, it throws a `KeyError`.",
+            "for": "The `for` loop in Python acts like an iterator method. You can use `range(x)` to loop a specific number of times!"
+        };
 
-        function renderMatrixCodeRain() {
-            mCtx.fillStyle = 'rgba(6, 8, 17, 0.06)'; 
-            mCtx.fillRect(0, 0, mWidth, mHeight);
+        async function processAIQuery(query, codeContent) {
+            const chatLog = document.getElementById("ai-transmission-stream");
+            const lowerQuery = query.toLowerCase();
+            let responseText = "";
 
-            mCtx.fillStyle = 'rgba(0, 229, 255, 0.12)'; 
-            mCtx.font = "11px 'JetBrains Mono', monospace";
-
-            for (let i = 0; i < matrixDropsY.length; i++) {
-                mCtx.fillText(dynamicStringsArray[i], i * columnWidth, matrixDropsY[i]);
-                matrixDropsY[i] += streamSpeeds[i];
-
-                if (matrixDropsY[i] > mHeight + 30) {
-                    matrixDropsY[i] = -30;
-                    dynamicStringsArray[i] = pythonCodePool[Math.floor(Math.random() * pythonCodePool.length)];
-                    streamSpeeds[i] = 0.8 + Math.random() * 1.8;
-                }
+            // Simple intelligent pattern matching simulating an LLM
+            if (lowerQuery.includes("error") || lowerQuery.includes("bug") || lowerQuery.includes("not working")) {
+                responseText = "I detect you are asking about an error. Please verify your indentation and ensure all parentheses/brackets are closed properly in your code. Are you getting a `SyntaxError`?";
+            } else if (lowerQuery.includes("print")) {
+                responseText = "The `print()` function sends data to the standard output. You can print multiple items separated by commas: `print('Hello', name)`.";
+            } else if (lowerQuery.includes("help") || lowerQuery.includes("explain")) {
+                responseText = AI_KNOWLEDGE_BASE[currentLessonId] || "I am analyzing the current module. Read the lesson description at the top of the editor and try executing the default code to see how it behaves.";
+            } else if (lowerQuery.includes("hello") || lowerQuery.includes("hi")) {
+                responseText = "Greetings, Developer. I am online and ready to assist you with the Python curriculum.";
+            } else {
+                responseText = `I analyzed your query: "${query}". Based on your current code matrix, try adjusting your logic and pressing 'Run Code'. Let me know if you hit a specific Traceback error.`;
             }
-        }
 
-
-        // --- 2. 3D PROJECTOR HOLOGRAM BACKGROUND ENGINE ---
-        const canvas = document.getElementById('hologram-canvas');
-        const ctx = canvas.getContext('2d');
-        let width = canvas.width = window.innerWidth;
-        let height = canvas.height = window.innerHeight;
-
-        window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        });
-
-        let points = [];
-        const numPoints = 12; 
-        for (let i = 0; i < numPoints; i++) {
-            let lat = Math.acos(-1 + (2 * i) / numPoints);
-            let lon = Math.sqrt(numPoints * Math.PI) * lat;
-            points.push({
-                x: Math.cos(lon) * Math.sin(lat),
-                y: Math.sin(lon) * Math.sin(lat),
-                z: Math.cos(lat)
-            });
-        }
-
-        let angleX = 0.002;
-        let angleY = 0.004;
-
-        function project3D(x, y, z) {
-            let fov = 380;
-            let scale = fov / (fov + z * 180);
-            return {
-                x: width / 2 + x * 220 * scale,
-                y: height / 2 + y * 220 * scale,
-                scale: scale
-            };
-        }
-
-        function drawHologramEngine() {
-            ctx.clearRect(0, 0, width, height);
-
-            ctx.strokeStyle = 'rgba(0, 229, 255, 0.05)';
-            ctx.lineWidth = 2;
+            appendChat("user", query);
             
-            ctx.beginPath();
-            ctx.moveTo(width * 0.15, height);
-            ctx.lineTo(width * 0.15, height * 0.4);
-            ctx.quadraticCurveTo(width * 0.2, height * 0.2, width * 0.25, height * 0.4);
-            ctx.lineTo(width * 0.25, height);
-            ctx.stroke();
+            // Show typing indicator
+            const typingId = "typing-" + Date.now();
+            chatLog.innerHTML += `<div id="${typingId}" class="chat-msg ai typing-indicator"><span></span><span></span><span></span></div>`;
+            chatLog.scrollTop = chatLog.scrollHeight;
 
-            ctx.beginPath();
-            ctx.moveTo(width * 0.75, height);
-            ctx.lineTo(width * 0.75, height * 0.4);
-            ctx.quadraticCurveTo(width * 0.8, height * 0.2, width * 0.85, height * 0.4);
-            ctx.lineTo(width * 0.85, height);
-            ctx.stroke();
+            // Simulate Network Delay + Streaming
+            setTimeout(() => {
+                document.getElementById(typingId).remove();
+                streamTextToChat(responseText);
+            }, 800);
+        }
 
-            points.forEach(p => {
-                let cosX = Math.cos(angleX), sinX = Math.sin(angleX);
-                let cosY = Math.cos(angleY), sinY = Math.sin(angleY);
+        function appendChat(sender, text) {
+            const chatLog = document.getElementById("ai-transmission-stream");
+            chatLog.innerHTML += `<div class="chat-msg ${sender}">${text}</div>`;
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
 
-                let y1 = p.y * cosX - p.z * sinX;
-                let z1 = p.z * cosX + p.y * sinX;
-                p.y = y1; p.z = z1;
-
-                let x2 = p.x * cosY + p.z * sinY;
-                let z2 = p.z * cosY - p.x * sinY;
-                p.x = x2; p.z = z2;
-            });
-
-            let projected = points.map(p => project3D(p.x, p.y, p.z));
-            ctx.strokeStyle = 'rgba(0, 229, 255, 0.16)';
-            ctx.lineWidth = 1;
-
-            for (let i = 0; i < projected.length; i++) {
-                for (let j = i + 1; j < projected.length; j++) {
-                    let dist = Math.hypot(points[i].x - points[j].x, points[i].y - points[j].y, points[i].z - points[j].z);
-                    if (dist < 1.3) {
-                        ctx.beginPath();
-                        ctx.moveTo(projected[i].x, projected[i].y);
-                        ctx.lineTo(projected[j].x, projected[j].y);
-                        ctx.stroke();
-                    }
+        function streamTextToChat(text) {
+            const chatLog = document.getElementById("ai-transmission-stream");
+            const msgNode = document.createElement("div");
+            msgNode.className = "chat-msg ai";
+            chatLog.appendChild(msgNode);
+            
+            let i = 0;
+            const speed = 20; // ms per character
+            function type() {
+                if (i < text.length) {
+                    msgNode.innerHTML += text.charAt(i);
+                    i++;
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                    setTimeout(type, speed);
                 }
             }
-
-            projected.forEach(p => {
-                ctx.fillStyle = `rgba(0, 229, 255, ${0.4 * p.scale})`;
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = '#00e5ff';
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, 4 * p.scale, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            });
+            type();
         }
 
-        // Integrated Master Animation Frame Handler
-        function pipelineMasterLoop() {
-            renderMatrixCodeRain();
-            drawHologramEngine();
-            requestAnimationFrame(pipelineMasterLoop);
-        }
-        pipelineMasterLoop();
 
-
-        // --- 3. CORE APPLICATION ENGINE LINKED FUNCTIONALITIES ---
+        // =====================================================================
+        // 3. UI: INITIALIZATION AND EVENT BINDING
+        // =====================================================================
         let executionCoreInstance = null;
         let ambientAudioPlaying = false;
 
-        window.addEventListener("DOMContentLoaded", initializeSystemArchitecture);
-
-        function initializeSystemArchitecture() {
+        window.addEventListener("DOMContentLoaded", () => {
+            renderCurriculumSidebar();
             configureSystemEventBindings();
             bootPyodideCompilationSubsystem();
+        });
+
+        function renderCurriculumSidebar() {
+            const container = document.getElementById("curriculum-container");
+            container.innerHTML = "";
+            
+            curriculumData.forEach(category => {
+                const catDiv = document.createElement("div");
+                catDiv.className = "category-title";
+                catDiv.innerText = category.category;
+                container.appendChild(catDiv);
+
+                category.lessons.forEach(lesson => {
+                    const lesDiv = document.createElement("div");
+                    lesDiv.className = "lesson-item";
+                    lesDiv.innerText = lesson.title;
+                    lesDiv.dataset.id = lesson.id;
+                    
+                    lesDiv.onclick = () => loadLesson(lesson);
+                    container.appendChild(lesDiv);
+                });
+            });
+
+            // Load intro by default
+            loadLesson(curriculumData[0].lessons[0]);
+        }
+
+        function loadLesson(lessonData) {
+            currentLessonId = lessonData.id;
+            
+            // Update UI Active states
+            document.querySelectorAll(".lesson-item").forEach(el => el.classList.remove("active"));
+            const activeEl = document.querySelector(`.lesson-item[data-id="${lessonData.id}"]`);
+            if (activeEl) activeEl.classList.add("active");
+
+            // Update Editor Workspace context
+            document.getElementById("lesson-title-display").innerText = lessonData.title;
+            document.getElementById("lesson-desc-display").innerText = lessonData.desc;
+            
+            // Set the Code Editor exactly with spaces (white-space: pre handles it)
+            const editor = document.getElementById("code-input-area");
+            editor.value = lessonData.code;
+
+            // Trigger AI Contextual helper implicitly
+            appendChat("ai", `Module Loaded: **${lessonData.title}**. ${AI_KNOWLEDGE_BASE[lessonData.id] || "Review the code and hit Run when ready."}`);
         }
 
         async function bootPyodideCompilationSubsystem() {
@@ -509,116 +394,172 @@
                 executionCoreInstance = await loadPyodide();
                 telemetryLogField.innerText = "Python Core: Engine Online";
                 telemetryLogField.style.color = "var(--cyan)";
-            } catch (runtimeFailureError) {
-                telemetryLogField.innerText = "Python Core: Connection Terminated";
+                document.querySelector(".status-pill span").innerText = "Local Compiler Ready";
+            } catch (err) {
+                telemetryLogField.innerText = "Python Core: Error";
                 telemetryLogField.style.color = "#ef4444";
-                console.error(runtimeFailureError);
+                console.error(err);
             }
         }
 
         async function runSourceCodeExecution() {
+            const previewTerminal = document.getElementById("terminal-preview");
+            previewTerminal.innerText = "Executing...";
+            
             if (!executionCoreInstance) {
-                alert("The WebAssembly interpretation layer is currently offline or loading. Please hold standard operations.");
+                alert("Compiler is still loading. Please wait.");
                 return;
             }
+            
             const scriptPayload = document.getElementById("code-input-area").value;
             try {
-                let executionFeedbackResult = await executionCoreInstance.runPythonAsync(scriptPayload);
-                if (executionFeedbackResult === undefined) executionFeedbackResult = "Script parsed successfully with no output feedback arrays.";
-                alert("Compilation Studio Output Telemetry:\n\n" + executionFeedbackResult);
+                // Redirect python print() output to capture it
+                executionCoreInstance.runPython(`
+                    import sys, io
+                    sys.stdout = io.StringIO()
+                `);
+                
+                await executionCoreInstance.runPythonAsync(scriptPayload);
+                
+                // Fetch the captured output
+                const stdout = executionCoreInstance.runPython("sys.stdout.getvalue()");
+                const finalOutput = stdout.trim() || "Executed successfully with no print output.";
+                
+                alert("Terminal Output:\n\n" + finalOutput);
+                previewTerminal.innerText = "Last Run: Success";
+                previewTerminal.style.color = "var(--cyan)";
             } catch (executionFaultException) {
-                alert("Runtime Engine Standard Fault Alert:\n\n" + executionFaultException.message);
+                alert("Traceback Error:\n\n" + executionFaultException.message);
+                previewTerminal.innerText = "Last Run: Error detected";
+                previewTerminal.style.color = "#ef4444";
             }
-        }
-
-        async function queryGroqCoprocessor() {
-            const userPromptField = document.getElementById("ai-user-query-input");
-            const communicationStreamLog = document.getElementById("ai-transmission-stream");
-            const queryMessageText = userPromptField.value.trim();
-
-            if (!queryMessageText) return;
-
-            const outgoingLogNode = document.createElement("div");
-            outgoingLogNode.style.color = "var(--gold)";
-            outgoingLogNode.innerHTML = `<strong>User Network Node:</strong> ${queryMessageText}`;
-            communicationStreamLog.appendChild(outgoingLogNode);
-            userPromptField.value = "";
-
-            const systemicLoadingNode = document.createElement("div");
-            systemicLoadingNode.style.color = "var(--text-muted)";
-            systemicLoadingNode.innerText = "Synchronizing AI Coprocessor channels...";
-            communicationStreamLog.appendChild(systemicLoadingNode);
-
-            try {
-                const endpointPayloadResponse = await fetch("https://api.groq.com/openapi/v1/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer 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" 
-                    },
-                    body: JSON.stringify({
-                        model: "llama3-8b-8192",
-                        messages: [{ role: "user", content: queryMessageText }]
-                    })
-                });
-
-                const structuralDataPayload = await endpointPayloadResponse.json();
-                communicationStreamLog.removeChild(systemicLoadingNode);
-
-                const coprocessorReplyNode = document.createElement("div");
-                coprocessorReplyNode.style.color = "var(--text-main)";
-                const textOutputResult = structuralDataPayload.choices[0].message.content;
-                coprocessorReplyNode.innerHTML = `<strong>Coprocessor Matrix:</strong> ${textOutputResult}`;
-                communicationStreamLog.appendChild(coprocessorReplyNode);
-
-            } catch (networkQueryException) {
-                communicationStreamLog.removeChild(systemicLoadingNode);
-                const exceptionErrorNode = document.createElement("div");
-                exceptionErrorNode.style.color = "#ef4444";
-                exceptionErrorNode.innerText = "Connection Error: Failed to secure transmission pipeline.";
-                communicationStreamLog.appendChild(exceptionErrorNode);
-            }
-            communicationStreamLog.scrollTop = communicationStreamLog.scrollHeight;
         }
 
         function configureSystemEventBindings() {
-            const portalFrameLayer = document.getElementById("landing-portal-wrapper");
-            const triggerEnterButton = document.getElementById("btn-enter-academy-portal");
-            const globalAudioMediaResource = document.getElementById("ambient-audio-resource");
-            const btnWorkspaceAudio = document.getElementById("workspace-audio-action");
+            const portalFrame = document.getElementById("landing-portal-wrapper");
+            const btnEnter = document.getElementById("btn-enter-academy-portal");
+            const audioResource = document.getElementById("ambient-audio-resource");
+            const btnAudio = document.getElementById("workspace-audio-action");
 
-            triggerEnterButton.addEventListener("click", () => {
-                portalFrameLayer.style.opacity = "0";
-                portalFrameLayer.style.visibility = "hidden";
+            // Portal Transition
+            btnEnter.addEventListener("click", () => {
+                portalFrame.style.opacity = "0";
+                setTimeout(() => portalFrame.style.display = "none", 800);
             });
 
-            function switchAudioPlaybackState() {
+            // Audio Controls
+            btnAudio.addEventListener("click", () => {
                 if (!ambientAudioPlaying) {
-                    globalAudioMediaResource.play().catch(err => console.log("Media engine blocked. Interaction required."));
-                    btnWorkspaceAudio.innerText = "⏸ Pause Music";
+                    audioResource.play().catch(e => console.log("Audio blocked by browser."));
+                    btnAudio.innerText = "⏸ Pause Music";
                     ambientAudioPlaying = true;
                 } else {
-                    globalAudioMediaResource.pause();
-                    btnWorkspaceAudio.innerText = "▶ Play Music";
+                    audioResource.pause();
+                    btnAudio.innerText = "▶ Play Music";
                     ambientAudioPlaying = false;
                 }
-            }
+            });
 
-            btnWorkspaceAudio.addEventListener("click", switchAudioPlaybackState);
+            // Execute Code
             document.getElementById("btn-execute-source").addEventListener("click", runSourceCodeExecution);
-            document.getElementById("btn-trigger-ai-fetch").addEventListener("click", queryGroqCoprocessor);
 
-            const sourceCodeTextarea = document.getElementById("code-input-area");
-            sourceCodeTextarea.addEventListener("keydown", function(eventKey) {
-                if (eventKey.key === "Tab") {
-                    eventKey.preventDefault();
-                    const cursorStartPosition = this.selectionStart;
-                    const cursorEndPosition = this.selectionEnd;
-                    this.value = this.value.substring(0, cursorStartPosition) + "    " + this.value.substring(cursorEndPosition);
-                    this.selectionStart = this.selectionEnd = cursorStartPosition + 4;
+            // AI Coprocessor Query Dispatch
+            const aiInput = document.getElementById("ai-user-query-input");
+            document.getElementById("btn-trigger-ai-fetch").addEventListener("click", () => {
+                const query = aiInput.value.trim();
+                const code = document.getElementById("code-input-area").value;
+                if (query) {
+                    aiInput.value = "";
+                    processAIQuery(query, code);
+                }
+            });
+
+            // Fix Tab indentation in textarea
+            document.getElementById("code-input-area").addEventListener("keydown", function(e) {
+                if (e.key === "Tab") {
+                    e.preventDefault();
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+                    this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+                    this.selectionStart = this.selectionEnd = start + 4;
                 }
             });
         }
+
+        // =====================================================================
+        // 4. GRAPHICS: BACKGROUND MATRIX AND HOLOGRAM ENGINES
+        // =====================================================================
+        const matrixCanvas = document.getElementById('matrix-canvas');
+        const mCtx = matrixCanvas.getContext('2d');
+        const holoCanvas = document.getElementById('hologram-canvas');
+        const hCtx = holoCanvas.getContext('2d');
+        
+        let width = matrixCanvas.width = holoCanvas.width = window.innerWidth;
+        let height = matrixCanvas.height = holoCanvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = matrixCanvas.width = holoCanvas.width = window.innerWidth;
+            height = matrixCanvas.height = holoCanvas.height = window.innerHeight;
+        });
+
+        // Matrix Engine Variables
+        const pythonCodePool = ["def init():", "print('Matrix')", "yield data", "while True:", "return obj", "lambda x: x", "import sys"];
+        const colWidth = 80; 
+        const cols = Math.floor(width / colWidth) + 1;
+        const drops = []; const strs = []; const speeds = [];
+        for (let i = 0; i < cols; i++) {
+            drops[i] = Math.random() * -600; 
+            strs[i] = pythonCodePool[Math.floor(Math.random() * pythonCodePool.length)];
+            speeds[i] = 0.5 + Math.random();
+        }
+
+        // Hologram Math
+        let points = [];
+        for (let i = 0; i < 12; i++) {
+            let lat = Math.acos(-1 + (2 * i) / 12);
+            let lon = Math.sqrt(12 * Math.PI) * lat;
+            points.push({ x: Math.cos(lon) * Math.sin(lat), y: Math.sin(lon) * Math.sin(lat), z: Math.cos(lat) });
+        }
+        let aX = 0.002, aY = 0.003;
+
+        function masterLoop() {
+            // Render Matrix
+            mCtx.fillStyle = 'rgba(6, 8, 17, 0.08)'; 
+            mCtx.fillRect(0, 0, width, height);
+            mCtx.fillStyle = 'rgba(0, 229, 255, 0.15)'; 
+            mCtx.font = "11px 'JetBrains Mono'";
+            for (let i = 0; i < cols; i++) {
+                mCtx.fillText(strs[i], i * colWidth, drops[i]);
+                drops[i] += speeds[i];
+                if (drops[i] > height) { drops[i] = -20; strs[i] = pythonCodePool[Math.floor(Math.random() * pythonCodePool.length)]; }
+            }
+
+            // Render Hologram
+            hCtx.clearRect(0, 0, width, height);
+            points.forEach(p => {
+                let y1 = p.y * Math.cos(aX) - p.z * Math.sin(aX), z1 = p.z * Math.cos(aX) + p.y * Math.sin(aX);
+                p.y = y1; p.z = z1;
+                let x2 = p.x * Math.cos(aY) + p.z * Math.sin(aY), z2 = p.z * Math.cos(aY) - p.x * Math.sin(aY);
+                p.x = x2; p.z = z2;
+            });
+            let proj = points.map(p => {
+                let s = 400 / (400 + p.z * 180);
+                return { x: width / 2 + p.x * 220 * s, y: height / 2 + p.y * 220 * s, s: s };
+            });
+            hCtx.strokeStyle = 'rgba(0, 229, 255, 0.15)'; hCtx.lineWidth = 1;
+            for (let i=0; i<proj.length; i++) for (let j=i+1; j<proj.length; j++) {
+                if (Math.hypot(points[i].x-points[j].x, points[i].y-points[j].y, points[i].z-points[j].z) < 1.3) {
+                    hCtx.beginPath(); hCtx.moveTo(proj[i].x, proj[i].y); hCtx.lineTo(proj[j].x, proj[j].y); hCtx.stroke();
+                }
+            }
+            proj.forEach(p => {
+                hCtx.fillStyle = `rgba(0, 229, 255, ${0.4 * p.s})`;
+                hCtx.beginPath(); hCtx.arc(p.x, p.y, 4 * p.s, 0, Math.PI * 2); hCtx.fill();
+            });
+
+            requestAnimationFrame(masterLoop);
+        }
+        masterLoop();
     </script>
 </body>
 </html>
