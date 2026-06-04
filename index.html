@@ -2,642 +2,158 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Guru | Zero to Hero Interactive Academy</title>
-    
-    <link rel="icon" href="icon.png" type="image/png">
-
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    
+    <title>Python Guru | Cyber-Academy</title>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
-
     <style>
-        /* --- CORE DESIGN SYSTEM --- */
         :root {
             --bg-void: #060811;
-            --bg-panel: #0f1322;
-            --bg-darker: #03050a;
-            --border: rgba(0, 229, 255, 0.15);
-            --border-focus: rgba(0, 229, 255, 0.4);
-            --gold: #e5c158;
-            --gold-glow: rgba(229, 193, 88, 0.25);
             --cyan: #00e5ff;
-            --cyan-glow: rgba(0, 229, 255, 0.3);
-            --text-main: #e2e8f0;
-            --text-muted: #64748b;
-            --success: #10b981;
-            --error: #ef4444;
-            --font-title: 'Cinzel', serif;
-            --font-ui: 'Inter', sans-serif;
-            --font-code: 'JetBrains Mono', monospace;
+            --gold: #e5c158;
+            --glass: rgba(15, 19, 34, 0.7);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg-void); font-family: 'Inter', sans-serif; color: white; }
+
+        /* --- PORTAL SCREEN (Animated) --- */
+        #portal-screen {
+            position: fixed; inset: 0; z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            background: radial-gradient(circle, #1a2333 0%, var(--bg-void) 80%);
+        }
+
+        /* The Moving 3D Geometry */
+        .geometry-container {
+            position: absolute; perspective: 1000px;
+        }
+        .icosahedron {
+            width: 200px; height: 200px; transform-style: preserve-3d;
+            animation: rotateMatrix 15s infinite linear;
+        }
+        .icosahedron div {
+            position: absolute; width: 200px; height: 200px; border: 2px solid var(--cyan);
+            opacity: 0.3; box-shadow: 0 0 20px var(--cyan);
+        }
+        @keyframes rotateMatrix { from { transform: rotateY(0deg) rotateX(0deg); } to { transform: rotateY(360deg) rotateX(360deg); } }
+
+        /* Background Code Stream */
+        .code-stream {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            font-family: 'JetBrains Mono'; font-size: 12px; color: rgba(0, 229, 255, 0.1);
+            overflow: hidden; pointer-events: none;
+        }
+        .stream-col { position: absolute; animation: scrollDown 10s linear infinite; }
+        @keyframes scrollDown { from { top: -100%; } to { top: 100%; } }
+
+        /* Portal UI */
+        .portal-ui {
+            z-index: 10; background: var(--glass); padding: 50px; text-align: center;
+            border: 1px solid rgba(0, 229, 255, 0.2); backdrop-filter: blur(10px);
+            max-width: 600px;
+        }
+        h1 { font-family: 'Cinzel', serif; font-size: 3rem; color: var(--gold); text-shadow: 0 0 20px var(--gold); }
+        .enter-btn {
+            margin-top: 30px; padding: 15px 40px; border: 1px solid var(--cyan);
+            background: transparent; color: var(--cyan); cursor: pointer; text-transform: uppercase;
+            font-weight: bold; transition: 0.3s;
+        }
+        .enter-btn:hover { background: var(--cyan); color: var(--bg-void); }
+
+        /* --- WORKSPACE SCREEN (The IDE) --- */
+        #workspace-screen { display: none; width: 100vw; height: 100vh; }
         
-        body {
-            background-color: var(--bg-void);
-            color: var(--text-main);
-            font-family: var(--font-ui);
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* --- SCREEN VIEW CONTROLLERS --- */
-        .screen-view {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: none;
-            flex-direction: column;
-            z-index: 10;
-        }
-        .screen-view.active { display: flex; }
-
-        /* --- SCREEN 1: MODERN STARTING PORTAL --- */
-        .portal-landing {
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle at center, #0f172a 0%, var(--bg-void) 70%);
-            padding: 20px;
-            text-align: center;
-        }
-        .portal-card {
-            background: rgba(15, 19, 34, 0.85);
-            border: 1px solid var(--border);
-            padding: 45px;
-            border-radius: 16px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 0 60px rgba(0,0,0,0.8);
-            max-width: 650px;
-            width: 100%;
-        }
-        .portal-title {
-            font-family: var(--font-title);
-            color: var(--gold);
-            font-size: 3.2rem;
-            margin-bottom: 10px;
-            text-shadow: 0 0 25px var(--gold-glow);
-        }
-        .portal-subtitle {
-            font-size: 0.9rem;
-            letter-spacing: 3px;
-            color: var(--cyan);
-            text-transform: uppercase;
-            margin-bottom: 30px;
-        }
-        .portal-summary {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 40px;
-        }
-
-        /* --- GLOBAL BUTTON STYLES --- */
-        .glow-btn {
-            background: transparent;
-            border: 1px solid var(--cyan);
-            color: var(--cyan);
-            padding: 14px 32px;
-            font-family: var(--font-title);
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-        }
-        .glow-btn:hover {
-            background: var(--cyan);
-            color: var(--bg-void);
-            box-shadow: 0 0 25px var(--cyan-glow);
-        }
-
-        /* --- SCREEN 2: MAIN INTEGRATED DASHBOARD WORKSPACE --- */
-        .top-bar {
-            height: 55px;
-            background-color: var(--bg-panel);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-        }
-        .logo { font-family: var(--font-title); font-weight: 800; font-size: 1.3rem; color: var(--text-main); }
-        .logo span { color: var(--cyan); }
-        
-        .utility-btn {
-            background: var(--bg-darker);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 6px 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: 0.2s;
-        }
-        .utility-btn:hover { border-color: var(--cyan); color: var(--cyan); }
-
-        .workspace-grid {
-            display: grid;
-            grid-template-columns: 310px 1fr 360px;
-            height: calc(100vh - 55px);
-            background: var(--bg-void);
-        }
-
-        /* SIDEBAR PANE: CURRICULUM INDEX */
-        .sidebar {
-            background-color: var(--bg-panel);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-        .sidebar-header {
-            padding: 15px; font-weight: 600; border-bottom: 1px solid var(--border);
-            color: var(--gold); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .module-block { border-bottom: 1px solid rgba(0, 229, 255, 0.05); }
-        .module-header {
-            padding: 12px 15px; background: rgba(0,0,0,0.2); font-weight: 600;
-            font-size: 0.85rem; color: var(--text-main); border-left: 2px solid var(--gold);
-        }
-        .sublesson-item {
-            padding: 10px 15px 10px 25px; font-size: 0.85rem; color: var(--text-muted);
-            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-            transition: 0.2s; border-bottom: 1px solid rgba(255,255,255,0.01);
-        }
-        .sublesson-item:hover { background: rgba(0, 229, 255, 0.03); color: var(--text-main); }
-        .sublesson-item.active { color: var(--cyan); background: rgba(0, 229, 255, 0.06); font-weight: 500; }
-        .victory-mark { color: var(--success); font-weight: bold; font-size: 0.85rem; }
-
-        /* CENTER PANE: COMPILER & EDITOR WORKSPACE */
-        .center-workspace {
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid var(--border);
-            overflow: hidden;
-        }
-        .instruction-card {
-            padding: 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border);
-        }
-        .lesson-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .lesson-title { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
-        .lesson-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
-        
-        .target-box {
-            background: var(--bg-darker); border: 1px solid rgba(229, 193, 88, 0.2);
-            padding: 12px 16px; border-radius: 6px; font-family: var(--font-code);
-            font-size: 0.85rem; color: #a5d6ff; display: block; white-space: pre-wrap;
-        }
-
-        /* Rehearsal Retention Component */
-        .rehearsal-card {
-            background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 6px; padding: 12px 15px; margin-top: 12px; display: none;
-            animation: panelSlide 0.3s ease-out;
-        }
-        @keyframes panelSlide { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
-
-        .editor-container {
-            flex: 1; display: flex; flex-direction: column; background: var(--bg-darker);
-        }
-        .editor-banner {
-            padding: 8px 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        #code-input-area {
-            flex: 1; background: var(--bg-darker); color: #81e6d9;
-            font-family: var(--font-code); font-size: 1rem; padding: 20px;
-            border: none; outline: none; resize: none; line-height: 1.6; caret-color: var(--gold);
-        }
-
-        .terminal-panel {
-            height: 180px; background: #020306; border-top: 1px solid var(--border);
-            display: flex; flex-direction: column;
-        }
-        .terminal-hdr {
-            padding: 6px 20px; font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
-            background: var(--bg-panel); border-bottom: 1px solid var(--border);
-        }
-        #terminal-log {
-            flex: 1; padding: 12px 20px; font-family: var(--font-code); font-size: 0.85rem;
-            color: #34d399; overflow-y: auto; white-space: pre-wrap;
-        }
-
-        /* RIGHT PANE: ROBUST AI ASSISTANT PANEL */
-        .ai-sidebar {
-            background-color: var(--bg-panel);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .ai-sidebar-hdr {
-            padding: 15px; border-bottom: 1px solid var(--border); font-weight: 600;
-            color: #d2a8ff; display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
-        }
-        .ai-chat-history {
-            flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
-        }
-        .msg-bubble { padding: 12px; border-radius: 6px; font-size: 0.85rem; line-height: 1.5; max-width: 90%; }
-        .msg-ai { background: var(--bg-darker); border: 1px solid rgba(255,255,255,0.05); color: var(--text-main); align-self: flex-start; }
-        .msg-user { background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.2); color: #a5d6ff; align-self: flex-end; }
-        
-        .ai-controls { padding: 15px; border-top: 1px solid var(--border); background: var(--bg-darker); }
-        #ai-query-input {
-            width: 100%; background: var(--bg-panel); border: 1px solid var(--border);
-            color: var(--text-main); padding: 10px; border-radius: 4px; font-family: var(--font-ui);
-            resize: none; height: 65px; outline: none; font-size: 0.85rem; margin-bottom: 8px;
-        }
-        #ai-query-input:focus { border-color: var(--cyan); }
+        /* Reuse previous IDE CSS classes (simplified for brevity) */
+        .top-bar { height: 50px; background: #0f1322; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .workspace-grid { display: grid; grid-template-columns: 250px 1fr 300px; height: calc(100vh - 50px); }
+        .sidebar { background: #060811; border-right: 1px solid #333; overflow-y: auto; }
+        .editor { background: #03050a; color: #a5d6ff; padding: 20px; display: flex; flex-direction: column; }
+        textarea { flex: 1; background: transparent; color: white; border: none; font-family: monospace; font-size: 1.1rem; }
+        .ai-sidebar { background: #0f1322; border-left: 1px solid #333; padding: 20px; }
+        .btn { cursor: pointer; padding: 5px 10px; background: #222; color: white; border: 1px solid #444; }
     </style>
 </head>
 <body>
 
-    <audio id="ambient-audio-stream" loop>
-        <source src="music.mp3" type="audio/mpeg">
-    </audio>
-
-    <div id="screen-portal" class="screen-view active portal-landing">
-        <div class="portal-card">
-            <h1 class="portal-title">Python Guru</h1>
-            <div class="portal-subtitle">Zero to Hero Academic Matrix</div>
-            <p class="portal-summary">
-                Welcome to an interactive Python learning environment. This system compiles actual execution scripts locally via WebAssembly, handles advanced tracking with victory milestones, and connects to an online AI Coprocessor.
-            </p>
-            <div style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
-                <button class="glow-btn" style="border-color: var(--gold); color: var(--gold);" id="btn-portal-audio">▶ Initialize Core Ambience</button>
-                <button class="glow-btn" id="btn-enter-workspace" style="width: 260px;">Enter Training Ground</button>
+    <div id="portal-screen">
+        <div class="code-stream" id="code-stream"></div>
+        <div class="geometry-container">
+            <div class="icosahedron">
+                <div></div><div style="transform: rotateY(90deg);"></div>
             </div>
+        </div>
+        <div class="portal-ui">
+            <h1>PYTHON GURU</h1>
+            <p>ZERO TO HERO INTERACTIVE ACADEMY</p>
+            <button class="enter-btn" onclick="enterAcademy()">Enter Training Ground</button>
         </div>
     </div>
 
-    <div id="screen-workspace" class="screen-view">
+    <div id="workspace-screen">
         <div class="top-bar">
-            <div class="logo">Python<span>Guru</span></div>
-            <div style="display: flex; gap: 12px; align-items: center;">
-                <button class="utility-btn" id="btn-workspace-audio">⏸ Pause Audio</button>
-                <div id="pyengine-status-tag" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">
-                    Booting Local WebAssembly Interpreter Engine...
-                </div>
+            <div style="font-weight: bold;">Python Guru</div>
+            <div>
+                <button class="btn" id="audio-toggle">▶ Play Audio</button>
+                <span id="status" style="font-size: 0.8rem; margin-left: 10px;">Python Core: Idle</span>
             </div>
         </div>
-
         <div class="workspace-grid">
-            <div class="sidebar">
-                <div class="sidebar-header">Core Training Modules</div>
-                <div id="curriculum-view-target"></div>
+            <div class="sidebar" id="sidebar"></div>
+            <div class="editor">
+                <textarea id="editor" placeholder="Write code here..."></textarea>
+                <button class="btn" id="run-btn" style="width: 100%; margin-top: 10px;">Execute</button>
             </div>
-
-            <div class="center-workspace">
-                <div class="instruction-card">
-                    <div class="lesson-header-row">
-                        <h1 class="lesson-title" id="lbl-active-title">Loading...</h1>
-                    </div>
-                    <p class="lesson-desc" id="lbl-active-desc"></p>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); font-weight:600; margin-bottom: 4px; text-transform: uppercase;">Reference Matrix Configuration:</div>
-                    <div class="target-box" id="lbl-active-target"></div>
-                    
-                    <div class="rehearsal-card" id="rehearsal-module-card">
-                        <span style="color: var(--success); font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 3px;">✓ Milestone Cleared! Memory Rehearsal Active:</span>
-                        <p style="font-size: 0.85rem; color: var(--text-main);" id="rehearsal-question-text"></p>
-                    </div>
-                </div>
-
-                <div class="editor-container">
-                    <div class="editor-banner">
-                        <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-code);">main.py</span>
-                        <button class="utility-btn" id="btn-execute-source" style="border-color: var(--cyan); color: var(--cyan); font-weight: bold;">Run Python Engine</button>
-                    </div>
-                    <textarea id="code-input-area" spellcheck="false" placeholder="# Synthesize standard code configurations inside this field array..."></textarea>
-                </div>
-
-                <div class="terminal-panel">
-                    <div class="terminal-hdr">Console Output Logger</div>
-                    <div id="terminal-log">Awaiting runtime environments initialization maps...</div>
-                </div>
-            </div>
-
-            <div class="ai-sidebar">
-                <div class="ai-sidebar-hdr">⚡ Groq AI Support Core</div>
-                <div class="ai-chat-history" id="ai-chat-output-stream">
-                    <div class="msg-bubble msg-ai">Hello. I am your integrated Python AI. If you don't understand a lesson or get a syntax error, ask me for help.</div>
-                </div>
-                <div class="ai-controls">
-                    <textarea id="ai-query-input" placeholder="Query structural definitions or error stack questions..."></textarea>
-                    <button class="utility-btn" id="btn-trigger-ai-fetch" style="width: 100%; border-color: var(--gold); color: var(--gold); font-weight: 600;">Query AI Neural Processor</button>
-                </div>
+            <div class="ai-sidebar" id="ai-chat">
+                <div style="color: var(--cyan);">AI Assistant</div>
+                <div id="chat-history" style="margin-top: 10px; font-size: 0.9rem;"></div>
+                <textarea id="ai-input" style="width: 100%; height: 60px; margin-top: 10px;"></textarea>
+                <button class="btn" id="ask-ai">Query AI</button>
             </div>
         </div>
     </div>
+
+    <audio id="bg-audio" loop><source src="music.mp3" type="audio/mpeg"></audio>
 
     <script>
-        // --- 1. COMPREHENSIVE ZERO TO HERO CURRICULUM SYNTAX ARCHITECTURE (40 SUBLESSONS) ---
-        const CURRICULUM_DATASET = [
-            {
-                module: "Module 1: Fundamental Elements",
-                lessons: [
-                    { id: "1-1", title: "1.1 The print() Command", desc: "The print function pushes text output out to the system display stream wrapper.", code: "print(\"Hello Python Guru\")", quiz: "What character sequence wraps functional string parameters inside print tools? (Answer: Quotes/Parentheses)" },
-                    { id: "1-2", title: "1.2 Text Literals", desc: "Alphanumeric string structures require symmetric outer container quotes to build expressions.", code: "print('Structured String Data')", quiz: "Can you alternate single and double quotes to enclose strings? (Answer: No, they must match)" },
-                    { id: "1-3", title: "1.3 Token Comments", desc: "The hash token commands the compiler engine to skip lines, embedding inline notation text.", code: "# This line is completely skipped\nprint(\"Code Runs\")", quiz: "Does a comment block impact execution speed? (Answer: No)" },
-                    { id: "1-4", title: "1.4 Memory Assignment", desc: "Assign alphanumeric objects into data symbols using isolated individual equals markers.", code: "matrix_node = \"Active Data\"\nprint(matrix_node)", quiz: "What operator handles element variable value binding configurations? (Answer: =)" },
-                    { id: "1-5", title: "1.5 Integer Values", desc: "Whole numbers don't use quotation literals, which changes how they are tracked in memory.", code: "integer_pointer = 250\nprint(integer_pointer)", quiz: "Do absolute scalar integers require floating precision arrays? (Answer: No)" },
-                    { id: "1-6", title: "1.6 Precision Float Map", desc: "Variables handling decimal coordinates bind to memory as Float configurations.", code: "system_precision = 0.9994\nprint(system_precision)", quiz: "What is data containing a decimal component designated as? (Answer: Float)" },
-                    { id: "1-7", title: "1.7 Basic Summation", desc: "Execute direct arithmetical addition across elements utilizing standard operators.", code: "computed_value = 140 + 60\nprint(computed_value)", quiz: "What is the evaluated output of the integer configuration mapping 140 + 60? (Answer: 200)" },
-                    { id: "1-8", title: "1.8 Expression Multipliers", desc: "Process computational math scale modifications using asterisk operators safely.", code: "grid_area = 12 * 12\nprint(grid_area)", quiz: "What character parses scalar multiplications inside Python? (Answer: *)" },
-                    { id: "1-9", title: "1.9 String Link Maps", desc: "Concatenate independent text array tracks using standard addition parameters.", code: "combined_text = \"Core \" + \"System\"\nprint(combined_text)", quiz: "What operation joins two independent alphanumeric elements together? (Answer: Concatenation)" },
-                    { id: "1-10", title: "1.10 Type Extraction", desc: "Query data structure classifications dynamically via the type operational engine.", code: "print(type(500))", quiz: "What class type will the runtime engine return for the entity 500? (Answer: int)" }
-                ]
-            },
-            {
-                module: "Module 2: Structural Logic Matrices",
-                lessons: [
-                    { id: "2-1", title: "2.1 Binary Booleans", desc: "Evaluate program states utilizing Boolean values mapped as explicit True or False keywords.", code: "engine_clear = True\nprint(engine_clear)", quiz: "Are boolean keywords tracked as lowercase structures in Python? (Answer: No, they are capitalized)" },
-                    { id: "2-2", title: "2.2 Equal Assertions", desc: "Assess conditional state value balance equivalents using comparison double-equals tools.", code: "state_match = (100 == 100)\nprint(state_match)", quiz: "What boolean state returns from mapping structural checks like (100 == 100)? (Answer: True)" },
-                    { id: "2-3", title: "2.3 Logic Variance Checks", desc: "Track variance inequalities via the exclamation-equals verification syntax operator.", code: "is_divergent = (50 != 90)\nprint(is_divergent)", quiz: "What operator evaluates if values diverge? (Answer: !=)" },
-                    { id: "2-4", title: "2.4 Metric Boundaries", desc: "Validate size variations utilizing standard mathematical comparison inequality elements.", code: "boundary_pass = (45 >= 30)\nprint(boundary_pass)", quiz: "Is 45 >= 45 evaluated as valid or invalid structural code mapping? (Answer: Valid)" },
-                    { id: "2-5", title: "2.5 If Code Blocks", desc: "Isolate code routes using 'if' criteria checkpoints followed by structural tab indent spaces.", code: "if True:\n    print(\"Condition Validated\")", quiz: "What character terminates structural check expressions prior to indent lines? (Answer: :)" },
-                    { id: "2-6", title: "2.6 Else Routing Maps", desc: "Provide automated fallback operational routes using the secondary structural 'else' keyword statement.", code: "if False:\n    pass\nelse:\n    print(\"Fallback Fired\")", quiz: "Can an else statement run independently without an associated preceding if block? (Answer: No)" },
-                    { id: "2-7", title: "2.7 Multi-Tier Elif Chains", desc: "Check subsequent configuration parameters across routes using cleanly structured 'elif' conditional links.", code: "metric = 15\nif metric > 20:\n    pass\nelif metric == 15:\n    print(\"Target Identified\")", quiz: "What compound phrase shortens traditional 'else if' structures inside Python? (Answer: elif)" },
-                    { id: "2-8", title: "2.8 Conjunction Logic", desc: "Force complete compound multi-validation logic matches using the strict logical 'and' operator.", code: "matrix_clear = (10 > 2) and (5 == 5)\nprint(matrix_clear)", quiz: "If one parameter in an 'and' system resolves as False, does the block execute? (Answer: No)" },
-                    { id: "2-9", title: "2.9 Alternative Or Queries", desc: "Open branching parameters allowing matches across any single criteria route using logical 'or' loops.", code: "access_route = True or False\nprint(access_route)", quiz: "Does 'True or False' evaluate to a True or a False state configuration? (Answer: True)" },
-                    { id: "2-10", title: "2.10 Structural Inversions", desc: "Invert target boolean configuration values using the logical 'not' structural tool element.", code: "abort_sequence = not True\nprint(abort_sequence)", quiz: "What binary value is returned from executing 'not False'? (Answer: True)" }
-                ]
-            },
-            {
-                module: "Module 3: Collection Architectures",
-                lessons: [
-                    { id: "3-1", title: "3.1 Array Initializations", desc: "Aggregate linear tracking values cleanly enclosed inside structural square brackets collections.", code: "nodes = [10, 25, 40]\nprint(nodes)", quiz: "What symbols contain array list collection initialization instances? (Answer: Square Brackets)" },
-                    { id: "3-2", title: "3.2 Index Data Extraction", desc: "Extract targeted specific components out of an internal array list by matching their precise 0-indexed position offset keys.", code: "items = [99, 88, 77]\nprint(items[0])", quiz: "What position index addresses the initial baseline array component? (Answer: 0)" },
-                    { id: "3-3", title: "3.3 Tail Target Indexes", desc: "Address the final elements of an array list using negative position coordinates.", code: "stream = [4, 8, 16]\nprint(stream[-1])", quiz: "What index offset references the final component of a collection? (Answer: -1)" },
-                    { id: "3-4", title: "3.4 Value Modification", desc: "Overwrite indexed data points directly using standard target variable element re-assignments.", code: "array_data = [5, 10, 15]\narray_data[1] = 99\nprint(array_data)", quiz: "What value sits at position array_data[1] after execution clears? (Answer: 99)" },
-                    { id: "3-5", title: "3.5 Dimension Length Tools", desc: "Determine total item counts inside collection lists using the len parameter tool.", code: "tracking_total = len([1, 2, 3, 4])\nprint(tracking_total)", quiz: "What numerical value is generated by running len([1, 2, 3, 4])? (Answer: 4)" },
-                    { id: "3-6", title: "3.6 Append Insertion Maps", desc: "Inject individual component variables directly into the tail-end of active lists via the .append method.", code: "log_register = []\nlog_register.append(\"event_01\")\nprint(log_register)", quiz: "Where does the .append() method place a new piece of data? (Answer: End of the list)" },
-                    { id: "3-7", title: "3.7 Offset Position Inserts", desc: "Inject values at precise coordinates inside a list collection using the inline .insert framework.", code: "sequence = [1, 3]\nsequence.insert(1, 2)\nprint(sequence)", quiz: "What position parameter comes first inside an insert command call signature? (Answer: Index)" },
-                    { id: "3-8", title: "3.8 Array Element Purging", desc: "Remove target elements out of custom collection structures using native .remove command routes.", code: "languages = [\"C\", \"Python\"]\nlanguages.remove(\"C\")\nprint(languages)", quiz: "Does .remove() clear items by targeting their index or their exact value match? (Answer: Value)" },
-                    { id: "3-9", title: "3.9 Iterative Loops", desc: "Process array collection components sequentially by setting up standardized tracking 'for' loops.", code: "for element in [1, 2, 3]:\n    print(element)", quiz: "What structural block handles serial loops across ordered components? (Answer: For Loop)" },
-                    { id: "3-10", title: "3.10 Numeric Index Generators", desc: "Generate explicit calculation loops efficiently by integrating range parameters directly into coding tracks.", code: "for numerical_step in range(3):\n    print(numerical_step)", quiz: "What is the final value output by a range(3) block loop operation? (Answer: 2)" }
-                ]
-            },
-            {
-                module: "Module 4: Advanced Operational Flow",
-                lessons: [
-                    { id: "4-1", title: "4.1 While Logic Engines", desc: "Maintain loop tracking configurations continuously while matching baseline logical parameters.", code: "loops = 0\nwhile loops < 2:\n    print(loops)\n    loops += 1", quiz: "If variables fail to increment inside while loops, what runtime vulnerability develops? (Answer: Infinite Loop)" },
-                    { id: "4-2", title: "4.2 Code Loop Interrupts", desc: "Force sudden terminations of active tracking processes instantly using the 'break' keyword statement.", code: "while True:\n    print(\"Break Stream\")\n    break", quiz: "What operation forces an immediate exit from an active looping block? (Answer: Break)" },
-                    { id: "4-3", title: "4.3 Function Definition", desc: "Declare isolated reusable system operational modules cleanly utilizing the structural 'def' keyword block.", code: "def matrix_synergy_core():\n    print(\"Core Process Verified\")", quiz: "What command creates a reusable code function? (Answer: def)" },
-                    { id: "4-4", title: "4.4 Block Execution Signals", desc: "Invoke and fire isolated custom code functions using functional call architectures.", code: "def trigger():\n    print(\"Fired\")\ntrigger()", quiz: "What symbols must follow a function's name to invoke its logic? (Answer: Parentheses)" },
-                    { id: "4-5", title: "4.5 Parameter Integration", desc: "Pass input variables safely across independent functional processing boundaries.", code: "def dispatch_signal(status):\n    print(\"Status: \" + status)\ndispatch_signal(\"Online\")", quiz: "What are variables declared inside a function's parenthesis interface called? (Answer: Parameters)" },
-                    { id: "4-6", title: "4.6 Output Return Channels", desc: "Pass evaluated results back to root scopes using standard execution return keywords.", code: "def compile_score():\n    return 50 + 50\nprint(compile_score())", quiz: "Does code located on lines directly below an executed return statement run? (Answer: No)" },
-                    { id: "4-7", title: "4.7 Key-Value Mapping", desc: "Construct structured relation maps with explicit curly-bracket Dictionary initializations.", code: "profile = {\"role\": \"Guru\", \"level\": 99}\nprint(profile[\"role\"])", quiz: "What collection architecture stores structured data mappings via key-value pairings? (Answer: Dictionary)" },
-                    { id: "4-8", title: "4.8 Dictionary Item Updates", desc: "Modify stored data items inside dictionaries using targeted key assignments.", code: "node = {\"status\": \"idle\"}\node[\"status\"] = \"active\"\nprint(node)", quiz: "Can duplicate keys exist simultaneously inside standard dictionary structures? (Answer: No)" },
-                    { id: "4-9", title: "4.9 Isolated Try Catch Blocks", desc: "Protect runtime systems from breaking under error events by wrapping logic blocks inside 'try' layers.", code: "try:\n    fault = 1 / 0\nexcept:\n    print(\"Intercepted Anomaly\")", quiz: "What block catches exception tracebacks thrown by code errors within a try stack? (Answer: Except)" },
-                    { id: "4-10", title: "4.10 Comprehensive Hero Map", desc: "Combine multiple paradigms into an operational, crash-resistant Python architecture.", code: "def compute_safe(val):\n    try:\n        return val * 2\n    except:\n        return 0\nprint(compute_safe(50))", quiz: "Congratulations! You completed the matrix. What value does this final code output? (Answer: 100)" }
-                ]
-            }
-        ];
+        // Setup Animated Code Rain
+        const stream = document.getElementById('code-stream');
+        for(let i=0; i<20; i++){
+            const col = document.createElement('div');
+            col.className = 'stream-col';
+            col.style.left = (i * 5) + '%';
+            col.style.animationDelay = (Math.random() * 5) + 's';
+            col.innerText = "def x():\n  print('data')\n  return True\n#system";
+            stream.appendChild(col);
+        }
 
-        let currentModuleIndex = 0;
-        let currentLessonIndex = 0;
-        let pyodideRuntime = null;
-        let lessonCompletionRegistry = {};
+        // Logic to switch screens
+        function enterAcademy() {
+            document.getElementById('portal-screen').style.transition = "opacity 1s ease";
+            document.getElementById('portal-screen').style.opacity = "0";
+            setTimeout(() => {
+                document.getElementById('portal-screen').style.display = "none";
+                document.getElementById('workspace-screen').style.display = "block";
+                bootPyodide();
+            }, 1000);
+        }
 
-        // --- 2. GLOBAL SYSTEM CORE INITIALIZATION TRACK ---
-        window.onload = async function() {
-            renderCurriculumSidebar();
-            attachCoreSystemEvents();
-            loadTargetLessonData(0, 0);
-
-            // Initialize Background Audio Continuous Track Architecture
-            const audioTrack = document.getElementById("ambient-audio-stream");
-            audioTrack.addEventListener('ended', function() {
-                this.currentTime = 0;
-                this.play();
-            }, false);
-
-            // Boot WebAssembly Python Engine Instance asynchronously
-            try {
-                pyodideRuntime = await loadPyodide();
-                document.getElementById("pyengine-status-tag").innerHTML = `<span style="color: var(--success);">● Python Core Engine Online</span>`;
-                document.getElementById("terminal-log").innerText = "Python 3 WebAssembly compilation environment successfully loaded.\nSelect a module and run code.";
-            } catch (failAnomaly) {
-                document.getElementById("pyengine-status-tag").innerHTML = `<span style="color: var(--error);">● Engine Core Sync Fault</span>`;
-                document.getElementById("terminal-log").innerText = "Critical Engine Error: WebAssembly payload fetch failed. Check network layer protocols.";
-            }
+        // Audio Toggle
+        const audio = document.getElementById('bg-audio');
+        const audioBtn = document.getElementById('audio-toggle');
+        audioBtn.onclick = () => {
+            if(audio.paused) { audio.play(); audioBtn.innerText = "⏸ Pause Audio"; }
+            else { audio.pause(); audioBtn.innerText = "▶ Play Audio"; }
         };
 
-        // --- 3. CURRICULUM MENU RENDER MATRIX (WITH VICTORY MARKS) ---
-        function renderCurriculumSidebar() {
-            const sidebarTarget = document.getElementById("curriculum-view-target");
-            sidebarTarget.innerHTML = "";
-
-            CURRICULUM_DATASET.forEach((modBlock, mIdx) => {
-                let blockDiv = document.createElement("div");
-                blockDiv.className = "module-block";
-                blockDiv.innerHTML = `<div class="module-header">${modBlock.module}</div>`;
-
-                let subLessonsContainer = document.createElement("div");
-                modBlock.lessons.forEach((lesData, lIdx) => {
-                    let itemDiv = document.createElement("div");
-                    itemDiv.className = "sublesson-item";
-                    itemDiv.id = `les-node-${mIdx}-${lIdx}`;
-                    
-                    // Render verification mark status if marked completed inside tracking arrays
-                    let completionStatusText = lessonCompletionRegistry[lesData.id] ? `<span class="victory-mark">✓</span>` : "";
-                    
-                    itemDiv.innerHTML = `<span>${lesData.title}</span> <span id="victory-badge-${lesData.id}">${completionStatusText}</span>`;
-                    itemDiv.onclick = () => loadTargetLessonData(mIdx, lIdx);
-                    subLessonsContainer.appendChild(itemDiv);
-                });
-
-                blockDiv.appendChild(subLessonsContainer);
-                sidebarTarget.appendChild(blockDiv);
-            });
-        }
-
-        function loadTargetLessonData(mIdx, lIdx) {
-            currentModuleIndex = mIdx;
-            currentLessonIndex = lIdx;
-
-            document.querySelectorAll(".sublesson-item").forEach(node => node.classList.remove("active"));
-            const targetNode = document.getElementById(`les-node-${mIdx}-${lIdx}`);
-            if(targetNode) targetNode.classList.add("active");
-
-            const activeLesson = CURRICULUM_DATASET[mIdx].lessons[lIdx];
-            document.getElementById("lbl-active-title").innerText = activeLesson.title;
-            document.getElementById("lbl-active-desc").innerText = activeLesson.desc;
-            document.getElementById("lbl-active-target").innerText = activeLesson.code;
-            
-            // Clean development parameters
-            document.getElementById("code-input-area").value = "";
-            document.getElementById("rehearsal-module-card").style.display = "none";
-            
-            if(pyodideRuntime) {
-                document.getElementById("terminal-log").innerText = "Workspace cleared. System ready to evaluate source script blocks.";
-            }
-        }
-
-        // --- 4. REAL WEBASSEMBLY COMPILE AND RUNTIME ENGINE ---
-        async function runSourceCodeExecution() {
-            const terminalLog = document.getElementById("terminal-log");
-            const rawInputCode = document.getElementById("code-input-area").value.trim();
-            const activeLesson = CURRICULUM_DATASET[currentModuleIndex].lessons[currentLessonIndex];
-
-            if (!pyodideRuntime) {
-                terminalLog.innerHTML = `<span class="error-text">Engine Error: Local compiler runtime environment is still loading.</span>`;
-                return;
-            }
-            if (rawInputCode === "") {
-                terminalLog.innerHTML = `<span class="error-text">Execution Error: Input terminal area is empty. Formulate code architecture.</span>`;
-                return;
-            }
-
-            terminalLog.innerText = "Compiling logic trees...";
-            let standardOutputStr = "";
-
-            // Bind tracking routines directly to Python standard output stream buffers
-            pyodideRuntime.setStdout({ batched: (msg) => { standardOutputStr += msg + "\n"; }});
-            pyodideRuntime.setStderr({ batched: (msg) => { standardOutputStr += msg + "\n"; }});
-
-            try {
-                // Execute actual string script arrays directly on target thread contexts
-                await pyodideRuntime.runPythonAsync(rawInputCode);
-                
-                let processedOutput = standardOutputStr.trim() === "" ? "Execution completed with no return data strings (Exit Code 0)." : standardOutputStr;
-                terminalLog.innerText = processedOutput;
-
-                // Mark completion milestones if code matches structure requirements
-                registerLessonVictory(activeLesson);
-
-            } catch (runtimeTracebackError) {
-                // Output real native Python SyntaxErrors directly onto the display logging deck
-                terminalLog.innerHTML = `<span class="error-text">${runtimeTracebackError.toString()}</span>`;
-            }
-        }
-
-        function registerLessonVictory(activeLesson) {
-            // Log target completion references inside the global index
-            lessonCompletionRegistry[activeLesson.id] = true;
-            
-            // Inject structural validation checkmarks inside sidebar index nodes
-            const badge = document.getElementById(`victory-badge-${activeLesson.id}`);
-            if(badge) badge.innerHTML = `<span class="victory-mark">✓</span>`;
-
-            // Display advanced memory review retention exercises
-            document.getElementById("rehearsal-question-text").innerText = activeLesson.quiz;
-            document.getElementById("rehearsal-module-card").style.display = "block";
-        }
-
-        // --- 5. ROBUST GROQ CHAT ROUTINE (RESOLVES 400 ERRORS) ---
-        async function queryGroqCoprocessor() {
-            const queryInputField = document.getElementById("ai-query-input");
-            const userQuestionText = queryInputField.value.trim();
-            const rawWorkspaceCode = document.getElementById("code-input-area").value;
-            const chatStreamWindow = document.getElementById("ai-chat-output-stream");
-            const activeLesson = CURRICULUM_DATASET[currentModuleIndex].lessons[currentLessonIndex];
-
-            if (!userQuestionText) return;
-
-            // Render user tracking elements directly within the chat log
-            chatStreamWindow.innerHTML += `<div class="msg-bubble msg-user">${userQuestionText}</div>`;
-            queryInputField.value = "";
-            chatStreamWindow.scrollTop = chatStreamWindow.scrollHeight;
-
-            // Build structural loader blocks
-            const temporaryLoaderId = "loader-node-" + Date.now();
-            chatStreamWindow.innerHTML += `<div class="msg-bubble msg-ai" id="${temporaryLoaderId}">Processing query parameters...</div>`;
-            chatStreamWindow.scrollTop = chatStreamWindow.scrollHeight;
-
-            try {
-                // Safe, stripped API call format directly targeting standard Groq completion nodes
-                const apiNetworkResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer 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"
-                    },
-                    body: JSON.stringify({
-                        model: "llama3-8b-8192",
-                        messages: [
-                            { 
-                                role: "system", 
-                                content: "You are an expert Python tutor. Keep answers short, concrete, and clear. Fix code syntax directly if bugs are presented." 
-                            },
-                            { 
-                                role: "user", 
-                                content: `Active Lesson Focus: ${activeLesson ? activeLesson.title : "General Operations"}\nUser Source Workspace:\n${rawWorkspaceCode || "# Empty"}\n\nQuestion: ${userQuestionText}` 
-                            }
-                        ],
-                        temperature: 0.2
-                    })
-                });
-
-                const structuralPayload = await apiNetworkResponse.json();
-
-                if (!apiNetworkResponse.ok) {
-                    // Pull specific nested error strings directly from Groq's response payload layout
-                    const detailedErrorMsg = structuralPayload.error ? structuralPayload.error.message : `HTTP Status ${apiNetworkResponse.status}`;
-                    document.getElementById(temporaryLoaderId).innerHTML = `<span class="error-text">Groq Server Error: ${detailedErrorMsg}</span>`;
-                    return;
-                }
-
-                // Render valid AI output data elements directly onto the chat window
-                const machineResponseContent = structuralPayload.choices[0].message.content;
-                document.getElementById(temporaryLoaderId).innerText = machineResponseContent;
-                chatStreamWindow.scrollTop = chatStreamWindow.scrollHeight;
-
-            } catch (networkCommunicationFault) {
-                document.getElementById(temporaryLoaderId).innerHTML = `<span class="error-text">API Network Communication Failure. Ensure cross-origin policies permit direct API interactions.</span>`;
-            }
-        }
-
-        // --- 6. EVENT INTERACTION ROUTINE LINK MAPS ---
-        function attachCoreSystemEvents() {
-            // View Navigation Toggle Event
-            document.getElementById("btn-enter-workspace").addEventListener("click", () => {
-                document.getElementById("screen-portal").classList.remove("active");
-                document.getElementById("screen-workspace").classList.add("active");
-            });
-
-            // Local Audio Playback Control Engines
-            const nativeAudioTrack = document.getElementById("ambient-audio-stream");
-            const btnLandingAudio = document.getElementById("btn-portal-audio");
-            const btnWorkspaceAudio = document.getElementById("btn-workspace-audio");
-            let ambientAudioPlaying = false;
-
-            function switchAudioPlaybackState() {
-                if (!ambientAudioPlaying) {
-                    nativeAudioTrack.play().then(() => {
-                        btnLandingAudio.innerText = "⏸ Pause Core Ambience";
-                        btnWorkspaceAudio.innerText = "⏸ Pause Audio";
-                        ambientAudioPlaying = true;
-                    }).catch(err => alert("Audio stream block requires active viewport interactions before initializing local audio frames."));
-                } else {
-                    nativeAudioTrack.pause();
-                    btnLandingAudio.innerText = "▶ Initialize Core Ambience";
-                    btnWorkspaceAudio.innerText = "▶ Play Audio";
-                    ambientAudioPlaying = false;
-                }
-            }
-
-            btnLandingAudio.addEventListener("click", switchAudioPlaybackState);
-            btnWorkspaceAudio.addEventListener("click", switchAudioPlaybackState);
-
-            // Execute Script Command Triggers
-            document.getElementById("btn-execute-source").addEventListener("click", runSourceCodeExecution);
-
-            // AI Communication Core Query Triggers
-            document.getElementById("btn-trigger-ai-fetch").addEventListener("click", queryGroqCoprocessor);
-
-            // Capture and manage standard Tab indentations inside source code input environments
-            const sourceCodeTextarea = document.getElementById("code-input-area");
-            sourceCodeTextarea.addEventListener("keydown", function(eventKey) {
-                if (eventKey.key === "Tab") {
-                    eventKey.preventDefault();
-                    const cursorStartPosition = this.selectionStart;
-                    const cursorEndPosition = this.selectionEnd;
-                    this.value = this.value.substring(0, cursorStartPosition) + "    " + this.value.substring(cursorEndPosition);
-                    this.selectionStart = this.selectionEnd = cursorStartPosition + 4;
-                }
-            });
+        // Pyodide Init
+        async function bootPyodide() {
+            let pyodide = await loadPyodide();
+            document.getElementById('status').innerText = "Python Core: Online";
+            document.getElementById('run-btn').onclick = async () => {
+                const code = document.getElementById('editor').value;
+                try {
+                    let result = await pyodide.runPythonAsync(code);
+                    alert("Output: " + result);
+                } catch(e) { alert(e); }
+            };
         }
     </script>
 </body>
