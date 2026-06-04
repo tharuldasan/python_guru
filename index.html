@@ -3,547 +3,391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Guru | Advanced Learning Core</title>
+    <title>Python Guru | Zero to Hero</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Fira+Code:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="icon.png" type="image/png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
 
     <style>
-        /* --- HIGH-END COLOR SYSTEM --- */
+        /* --- PROFESSIONAL IDE THEME --- */
         :root {
-            --bg-void: #030408;
-            --glass-panel: rgba(10, 15, 25, 0.75);
-            --glass-border: rgba(0, 229, 255, 0.2);
-            --gold: #E5C158;
-            --gold-dim: rgba(229, 193, 88, 0.4);
-            --cyan: #00E5FF;
-            --cyan-glow: rgba(0, 229, 255, 0.5);
-            --text-light: #F0F4F8;
-            --text-dim: #8892B0;
-            --font-title: 'Cinzel', serif;
-            --font-code: 'Fira Code', monospace;
+            --bg-main: #0d1117;
+            --bg-panel: #161b22;
+            --bg-darker: #010409;
+            --border: #30363d;
+            --accent: #58a6ff;
+            --accent-hover: #1f6feb;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --success: #3fb950;
+            --error: #f85149;
+            --font-ui: 'Inter', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
         }
 
-        /* --- GLOBAL RESETS --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
-            background-color: var(--bg-void);
-            color: var(--text-light);
-            font-family: var(--font-code);
-            overflow: hidden; /* Stop page scrolling, handle it inside components */
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: var(--font-ui);
             height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- TOP NAVIGATION BAR --- */
+        .top-bar {
+            height: 50px;
+            background-color: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            display: flex;
             align-items: center;
-            position: relative;
+            justify-content: space-between;
+            padding: 0 20px;
         }
-
-        /* --- DYNAMIC FLOATING MATRIX TEXT --- */
-        #particle-canvas {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-        .code-drop {
-            position: absolute;
-            color: var(--cyan);
-            opacity: 0.15;
-            font-size: 14px;
-            white-space: pre;
-            animation: fall linear infinite;
-        }
-        @keyframes fall {
-            from { transform: translateY(-10vh); opacity: 0; }
-            10% { opacity: 0.2; }
-            90% { opacity: 0.2; }
-            to { transform: translateY(110vh); opacity: 0; }
-        }
-
-        /* --- AUDIO CONTROLLER --- */
-        .audio-hud {
-            position: fixed;
-            top: 20px; right: 20px;
-            z-index: 100;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .hud-btn {
-            background: rgba(0,0,0,0.6);
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            padding: 8px 16px;
-            font-family: var(--font-code);
-            font-size: 12px;
-            cursor: pointer;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(229, 193, 88, 0.1);
-        }
-        .hud-btn:hover {
-            background: var(--gold);
-            color: var(--bg-void);
-            box-shadow: 0 0 15px var(--gold);
-        }
-
-        /* --- MAIN GLASSMORPHIC SHELL --- */
-        .app-shell {
-            position: relative;
-            z-index: 10;
-            width: 95vw;
-            height: 90vh;
-            background: var(--glass-panel);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0, 229, 255, 0.05);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* --- VIEW TRANSITIONS --- */
-        .view {
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            padding: 2rem;
-            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .view.active { display: flex; }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- UI ELEMENTS --- */
-        .title-gold {
-            font-family: var(--font-title);
-            color: var(--gold);
-            font-size: 3.5rem;
-            text-shadow: 0 0 20px var(--gold-dim);
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .subtitle {
-            color: var(--text-dim);
-            font-size: 1rem;
-            letter-spacing: 2px;
-            margin-bottom: 40px;
-            text-align: center;
-        }
-        .btn-core {
-            background: transparent;
-            border: 2px solid var(--cyan);
-            color: var(--cyan);
-            padding: 15px 40px;
-            font-family: var(--font-title);
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-core:hover {
-            background: var(--cyan);
-            color: var(--bg-void);
-            box-shadow: 0 0 30px var(--cyan-glow);
-        }
-
-        /* --- DASHBOARD GRID --- */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            width: 100%;
-            height: 100%;
-            gap: 20px;
-            align-items: start;
-            justify-content: start;
-        }
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--text-main); display: flex; align-items: center; gap: 10px;}
+        .logo span { color: var(--accent); }
         
-        /* Left Sidebar (Lessons) */
-        .sidebar {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        .sidebar-header {
-            padding: 15px;
-            border-bottom: 1px solid var(--glass-border);
-            color: var(--gold);
-            font-family: var(--font-title);
-            text-align: center;
-            font-size: 1.2rem;
-        }
-        .lesson-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .lesson-list::-webkit-scrollbar { width: 6px; }
-        .lesson-list::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 3px; }
-        
-        .lesson-item {
-            padding: 12px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid transparent;
-            border-radius: 4px;
+        .btn {
+            background: var(--bg-panel);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 6px;
             cursor: pointer;
+            font-family: var(--font-ui);
             font-size: 0.85rem;
-            transition: all 0.2s;
-            color: var(--text-dim);
+            transition: 0.2s;
         }
-        .lesson-item:hover { background: rgba(0, 229, 255, 0.05); color: var(--cyan); border-color: rgba(0, 229, 255, 0.2); }
-        .lesson-item.active { background: rgba(229, 193, 88, 0.1); color: var(--gold); border-left: 3px solid var(--gold); }
+        .btn:hover { background: var(--border); }
+        .btn-primary { background: var(--accent); color: #fff; border: none; }
+        .btn-primary:hover { background: var(--accent-hover); }
 
-        /* Right Workspace */
+        /* --- 3-PANE WORKSPACE LAYOUT --- */
         .workspace {
             display: flex;
-            flex-direction: column;
-            height: 100%;
-            gap: 15px;
+            height: calc(100vh - 50px);
         }
-        .info-panel {
-            background: rgba(0,0,0,0.4);
-            border-left: 3px solid var(--cyan);
-            padding: 20px;
-            border-radius: 4px;
-        }
-        .info-title { color: var(--cyan); font-size: 1.4rem; margin-bottom: 5px; }
-        
-        /* Code Editor */
-        .editor-container {
-            flex: 1;
-            position: relative;
-            background: #010204;
-            border: 1px solid var(--glass-border);
-            border-radius: 6px;
-            overflow: hidden;
+
+        /* Pane 1: Curriculum Sidebar */
+        .sidebar {
+            width: 300px;
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
         }
-        .editor-header {
-            background: rgba(255,255,255,0.05);
-            padding: 8px 15px;
-            font-size: 0.8rem;
-            color: var(--text-dim);
-            border-bottom: 1px solid var(--glass-border);
-            display: flex; justify-content: space-between;
+        .sidebar-header {
+            padding: 15px; font-weight: 600; border-bottom: 1px solid var(--border);
+            color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;
         }
-        .editor-area {
-            position: relative;
+        .module-group { border-bottom: 1px solid var(--border); }
+        .module-title {
+            padding: 12px 15px; background: var(--bg-darker); font-weight: 600;
+            cursor: pointer; display: flex; justify-content: space-between; font-size: 0.9rem;
+        }
+        .sublesson {
+            padding: 10px 15px 10px 30px; font-size: 0.85rem; color: var(--text-muted);
+            cursor: pointer; border-left: 2px solid transparent; transition: 0.2s;
+        }
+        .sublesson:hover { background: rgba(88, 166, 255, 0.1); color: var(--text-main); }
+        .sublesson.active { border-left-color: var(--accent); color: var(--accent); background: rgba(88, 166, 255, 0.05); }
+
+        /* Pane 2: Main Editor Area */
+        .main-editor {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-main);
         }
-        .code-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            padding: 15px; font-size: 1rem; line-height: 1.5; outline: none; border: none;
-            resize: none; white-space: pre; overflow: auto; background: transparent;
-        }
-        .watermark { color: rgba(255,255,255,0.1); z-index: 1; pointer-events: none; }
-        .input-layer { color: var(--cyan); z-index: 2; caret-color: var(--gold); }
         
-        /* Lower Panel (Terminal & AI) */
-        .lower-panel {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            height: 200px;
+        .lesson-brief {
+            padding: 20px; border-bottom: 1px solid var(--border); background: var(--bg-panel);
         }
-        .box {
-            background: #010204;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            display: flex; flex-direction: column;
+        .lesson-title { font-size: 1.5rem; margin-bottom: 8px; font-weight: 800; }
+        .lesson-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 15px;}
+        
+        .reference-code {
+            background: var(--bg-darker); border: 1px solid var(--border);
+            padding: 12px; border-radius: 6px; font-family: var(--font-code);
+            font-size: 0.85rem; color: #a5d6ff; display: inline-block;
         }
-        .box-header {
-            padding: 8px 12px; font-size: 0.8rem; background: rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--gold);
+
+        .editor-wrapper { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .editor-toolbar {
+            padding: 8px 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .term-output {
-            padding: 10px; flex: 1; overflow-y: auto; font-size: 0.85rem; color: #a7f3d0;
+        
+        /* The Clean Input Area */
+        #code-editor {
+            flex: 1; background: var(--bg-darker); color: var(--text-main);
+            font-family: var(--font-code); font-size: 1rem; padding: 20px;
+            border: none; outline: none; resize: none; line-height: 1.6;
         }
-        .ai-input {
-            width: 100%; padding: 10px; background: transparent; border: none;
-            border-bottom: 1px solid rgba(255,255,255,0.1); color: white;
-            font-family: var(--font-code); font-size: 0.85rem; outline: none;
+
+        .terminal-wrapper {
+            height: 200px; background: var(--bg-panel); border-top: 1px solid var(--border);
+            display: flex; flex-direction: column;
         }
-        .ai-output {
-            padding: 10px; flex: 1; overflow-y: auto; font-size: 0.85rem; color: #94a3b8; line-height: 1.4;
+        .terminal-header {
+            padding: 8px 20px; font-size: 0.8rem; font-weight: 600; color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
         }
+        #terminal-output {
+            flex: 1; padding: 15px 20px; font-family: var(--font-code); font-size: 0.9rem;
+            color: var(--success); overflow-y: auto; white-space: pre-wrap;
+        }
+        .error-text { color: var(--error) !important; }
+
+        /* Pane 3: AI Assistant */
+        .ai-sidebar {
+            width: 350px; background-color: var(--bg-panel); border-left: 1px solid var(--border);
+            display: flex; flex-direction: column;
+        }
+        .ai-header {
+            padding: 15px; border-bottom: 1px solid var(--border); font-weight: 600;
+            display: flex; align-items: center; gap: 8px; color: #d2a8ff;
+        }
+        .ai-chat { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        
+        .chat-bubble { padding: 12px; border-radius: 8px; font-size: 0.9rem; line-height: 1.5; }
+        .ai-message { background: var(--bg-darker); border: 1px solid var(--border); color: var(--text-main); }
+        .user-message { background: rgba(88, 166, 255, 0.1); border: 1px solid rgba(88, 166, 255, 0.2); color: #a5d6ff; align-self: flex-end; }
+        
+        .ai-input-area { padding: 15px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+        #ai-input {
+            width: 100%; background: var(--bg-darker); border: 1px solid var(--border);
+            color: var(--text-main); padding: 10px; border-radius: 6px; font-family: var(--font-ui);
+            resize: none; height: 80px; outline: none;
+        }
+        #ai-input:focus { border-color: var(--accent); }
+
     </style>
 </head>
 <body>
 
-    <audio id="audio-player" loop>
+    <audio id="bg-audio" loop>
         <source src="music.mp3" type="audio/mpeg">
     </audio>
 
-    <div class="audio-hud">
-        <button id="btn-audio" class="hud-btn">▶ Init Audio</button>
+    <div class="top-bar">
+        <div class="logo">Python<span>Guru</span></div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn" id="btn-audio">▶ Play Audio</button>
+            <div id="py-status" style="display: flex; align-items: center; font-size: 0.8rem; color: var(--text-muted);">
+                Booting Python Engine...
+            </div>
+        </div>
     </div>
 
-    <div id="particle-canvas"></div>
-
-    <div class="app-shell">
-        
-        <div id="view-landing" class="view active">
-            <h1 class="title-gold">Python Guru</h1>
-            <p class="subtitle">ADVANCED NEURAL SYNTRACT LEARNING ENVIRONMENT</p>
-            <button id="btn-enter" class="btn-core">Access Framework</button>
+    <div class="workspace">
+        <div class="sidebar">
+            <div class="sidebar-header">Zero to Hero Curriculum</div>
+            <div id="curriculum-container"></div>
         </div>
 
-        <div id="view-dashboard" class="view" style="padding: 1.5rem;">
-            <div class="dashboard-grid">
-                
-                <div class="sidebar">
-                    <div class="sidebar-header">Core Matrices</div>
-                    <div class="lesson-list" id="lesson-list">
-                        </div>
+        <div class="main-editor">
+            <div class="lesson-brief">
+                <h1 class="lesson-title" id="lbl-title">Loading...</h1>
+                <p class="lesson-desc" id="lbl-desc"></p>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Target Code to Memorize:</div>
+                <div class="reference-code" id="lbl-target"></div>
+            </div>
+
+            <div class="editor-wrapper">
+                <div class="editor-toolbar">
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-code);">main.py</span>
+                    <button class="btn btn-primary" id="btn-run">Run Python Engine</button>
                 </div>
+                <textarea id="code-editor" spellcheck="false" placeholder="# Write your python code here..."></textarea>
+            </div>
 
-                <div class="workspace">
-                    <div class="info-panel">
-                        <h2 id="lesson-title" class="info-title">Loading...</h2>
-                        <p id="lesson-desc" style="font-size: 0.95rem; color: var(--text-dim);"></p>
-                    </div>
-
-                    <div class="editor-container">
-                        <div class="editor-header">
-                            <span>workspace.py</span>
-                            <button id="btn-run" class="hud-btn" style="padding: 4px 12px; border-color: var(--cyan); color: var(--cyan);">Execute Code</button>
-                        </div>
-                        <div class="editor-area">
-                            <div id="code-watermark" class="code-layer watermark"></div>
-                            <textarea id="code-input" class="code-layer input-layer" spellcheck="false"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="lower-panel">
-                        <div class="box">
-                            <div class="box-header">Terminal Output</div>
-                            <div id="terminal" class="term-output">System ready...</div>
-                        </div>
-                        
-                        <div class="box" style="border-color: var(--gold-dim);">
-                            <div class="box-header">Groq AI Support Core 
-                                <button id="btn-ai" class="hud-btn" style="padding: 2px 8px;">Ask AI</button>
-                            </div>
-                            <input type="text" id="ai-query" class="ai-input" placeholder="Type your question here...">
-                            <div id="ai-response" class="ai-output">AI Coprocessor online. Standing by for queries.</div>
-                        </div>
-                    </div>
-                </div>
-
+            <div class="terminal-wrapper">
+                <div class="terminal-header">Console Output</div>
+                <div id="terminal-output">Awaiting initialization...</div>
             </div>
         </div>
 
+        <div class="ai-sidebar">
+            <div class="ai-header">
+                ⚡ Groq AI Support Core
+            </div>
+            <div class="ai-chat" id="chat-history">
+                <div class="chat-bubble ai-message">Hello. I am your integrated Python AI. If you don't understand a lesson or get a syntax error, ask me for help.</div>
+            </div>
+            <div class="ai-input-area">
+                <textarea id="ai-input" placeholder="Ask a question about the code..."></textarea>
+                <button class="btn btn-primary" id="btn-ask-ai" style="width: 100%;">Query AI</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        /* --- 1. DATA: 40 BEGINNER LESSONS --- */
-        const LESSONS = [
-            { id: 1, title: "01: The print() Element", desc: "Output string messages to the display console.", code: "print(\"Hello Python Guru\")" },
-            { id: 2, title: "02: Code Note Annotations", desc: "Incorporate inline program comments.", code: "# This is an operational note" },
-            { id: 3, title: "03: Variable Binding", desc: "Allocate memory space to reference data strings.", code: "message = \"Data Matrix Loaded\"" },
-            { id: 4, title: "04: Numerical Integrations", desc: "Bind simple absolute integer variables.", code: "points = 100" },
-            { id: 5, title: "05: Floating Entities", desc: "Map variable symbols to fractional values.", code: "accuracy = 0.98" },
-            { id: 6, title: "06: Basic Arithmetical Flows", desc: "Execute computational mathematical addition.", code: "total = 50 + 25" },
-            { id: 7, title: "07: Expression Multipliers", desc: "Perform multiplicative operational steps.", code: "area = 10 * 5" },
-            { id: 8, title: "08: String Structures", desc: "Define structural alphanumeric strings.", code: "syntax = \"Python Core\"" },
-            { id: 9, title: "09: Merging String Assets", desc: "Concatenate multiple separate text arrays.", code: "full = \"Core \" + \"Engine\"" },
-            { id: 10, title: "10: Value Conversions", desc: "Cast alphanumeric text instances into integers.", code: "converted = int(\"45\")" },
-            { id: 11, title: "11: Dynamic Float Casting", desc: "Transform integers into precise floats.", code: "floating_val = float(10)" },
-            { id: 12, title: "12: Text Multiplications", desc: "Replicate string structures iteratively.", code: "glow = \"Glow\" * 3" },
-            { id: 13, title: "13: Boolean States", desc: "Assign direct binary logic indicators.", code: "system_active = True" },
-            { id: 14, title: "14: Value Equality Probes", desc: "Examine if data variables share matching values.", code: "is_equal = (10 == 10)" },
-            { id: 15, title: "15: Inequality Tracking", desc: "Determine value variance deviations.", code: "is_deviant = (5 != 12)" },
-            { id: 16, title: "16: Scale Assessments", desc: "Determine mathematical hierarchy size variances.", code: "check = (15 >= 10)" },
-            { id: 17, title: "17: Conditional Execution", desc: "Branch system execution behavior via 'if'.", code: "if True:\n    print(\"Passed Check\")" },
-            { id: 18, title: "18: Secondary Branching", desc: "Incorporate 'else' logic statements.", code: "if False:\n    pass\nelse:\n    print(\"Fallback\")" },
-            { id: 19, title: "19: Multi-Tier Chains", desc: "Chain conditional evaluation routes via 'elif'.", code: "score = 85\nif score > 90:\n    pass\nelif score > 80:\n    print(\"B Tier\")" },
-            { id: 20, title: "20: Conjunction Logic", desc: "Combine validation statements using 'and'.", code: "valid = (5 > 2) and (10 > 8)" },
-            { id: 21, title: "21: Disjunction Logic", desc: "Process broader validation using 'or'.", code: "status = True or False" },
-            { id: 22, title: "22: Logic Inversions", desc: "Reverse binary properties using 'not'.", code: "halt = not True" },
-            { id: 23, title: "23: List Initializations", desc: "Construct mutable index data clusters.", code: "nodes = [10, 20, 30]" },
-            { id: 24, title: "24: Index Extraction", desc: "Retrieve target elements from a list.", code: "items = [5, 9, 2]\ntarget = items[0]" },
-            { id: 25, title: "25: Inverse Indexing", desc: "Target tail-end values inside a list.", code: "items = [4, 8, 12]\ntail = items[-1]" },
-            { id: 26, title: "26: Modifying Elements", desc: "Overwite target values inside an array.", code: "grid = [1, 2, 3]\ngrid[1] = 99" },
-            { id: 27, title: "27: Array Length Metrics", desc: "Determine total internal counts using len().", code: "sizes = len([4, 8, 12])" },
-            { id: 28, title: "28: Appending Data", desc: "Inject new components into a list.", code: "logs = []\nlogs.append(\"init\")" },
-            { id: 29, title: "29: Insert Operations", desc: "Incorporate records at specific offsets.", code: "nums = [1, 3]\nums.insert(1, 2)" },
-            { id: 30, title: "30: Element Purging", desc: "Remove target records via .remove().", code: "tech = [\"c\", \"py\"]\ntech.remove(\"c\")" },
-            { id: 31, title: "31: Iterative For Loops", desc: "Cycle across sequential array tracks.", code: "for i in [1, 2, 3]:\n    print(i)" },
-            { id: 32, title: "32: Numeric Generators", desc: "Generate explicit execution iteration indexes.", code: "for x in range(5):\n    print(x)" },
-            { id: 33, title: "33: While Loops", desc: "Maintain execution endlessly while true.", code: "runs = 0\nwhile runs < 3:\n    runs += 1" },
-            { id: 34, title: "34: Loop Interruptions", desc: "Force prompt terminations using 'break'.", code: "while True:\n    break" },
-            { id: 35, title: "35: Function Architecture", desc: "Declare reusable logic blocks via 'def'.", code: "def matrix_sync():\n    print(\"Synced\")" },
-            { id: 36, title: "36: Execution Invocation", desc: "Invoke targeted isolated function blocks.", code: "def trigger():\n    pass\ntrigger()" },
-            { id: 37, title: "37: Parametric Injections", desc: "Pass raw variables into functions safely.", code: "def signal(type):\n    print(type)\nsignal(\"High\")" },
-            { id: 38, title: "38: Return Channels", desc: "Pass evaluation values back to root scopes.", code: "def evaluate():\n    return 42\nresult = evaluate()" },
-            { id: 39, title: "39: Dictionary Maps", desc: "Map key-value pairings inside curly braces.", code: "user = {\"id\": 101, \"role\": \"admin\"}" },
-            { id: 40, title: "40: Error Exceptions", desc: "Insulate software blocks using try/except.", code: "try:\n    value = 1 / 0\nexcept:\n    print(\"Error Trapped\")"}
+        // --- 1. ZERO TO HERO CURRICULUM DATA ---
+        const CURRICULUM = [
+            {
+                module: "Module 1: The Absolute Basics",
+                lessons: [
+                    { title: "1.1 The Hello World", desc: "The print() function sends text to the screen. It's how Python speaks.", code: "print(\"Hello World\")" },
+                    { title: "1.2 Variables", desc: "Variables are containers for storing data values. No command is needed to declare them.", code: "name = \"Guru\"\nprint(name)" },
+                    { title: "1.3 Numbers & Math", desc: "Python can act as a calculator. Add numbers directly inside a print statement.", code: "print(50 + 25)" },
+                    { title: "1.4 Updating Variables", desc: "You can change the value of a variable after creating it.", code: "score = 10\nscore = score + 5\nprint(score)" }
+                ]
+            },
+            {
+                module: "Module 2: Logic & Control Flow",
+                lessons: [
+                    { title: "2.1 Booleans", desc: "Booleans represent one of two values: True or False.", code: "is_active = True\nprint(is_active)" },
+                    { title: "2.2 If Statements", desc: "Use 'if' to run code only when a condition is True. Remember the indentation (spaces)!", code: "age = 18\nif age >= 18:\n    print(\"Access Granted\")" },
+                    { title: "2.3 Else Statements", desc: "The 'else' keyword catches anything caught by the preceding conditions.", code: "power = 40\nif power > 50:\n    print(\"Strong\")\nelse:\n    print(\"Weak\")" },
+                    { title: "2.4 Elif Chains", desc: "'elif' means 'else if'. Use it to check multiple conditions.", code: "x = 10\nif x > 10:\n    print(\"High\")\nelif x == 10:\n    print(\"Exact\")" }
+                ]
+            },
+            {
+                module: "Module 3: Lists & Loops",
+                lessons: [
+                    { title: "3.1 Creating Lists", desc: "Lists store multiple items in a single variable, wrapped in square brackets.", code: "inventory = [\"Sword\", \"Shield\"]\nprint(inventory)" },
+                    { title: "3.2 List Append", desc: "Add an item to the end of a list using the .append() method.", code: "nums = [1, 2]\nnums.append(3)\nprint(nums)" },
+                    { title: "3.3 The For Loop", desc: "A for loop iterates over a sequence (like a list).", code: "items = [\"A\", \"B\", \"C\"]\nfor item in items:\n    print(item)" },
+                    { title: "3.4 The Range Loop", desc: "Use range() to loop a specific number of times.", code: "for x in range(3):\n    print(\"Looping...\")" }
+                ]
+            },
+            {
+                module: "Module 4: Functions (Hero Level)",
+                lessons: [
+                    { title: "4.1 Defining Functions", desc: "A function is a block of code that only runs when called. Created using 'def'.", code: "def greet():\n    print(\"Hello!\")\n\ngreet()" },
+                    { title: "4.2 Function Arguments", desc: "Information can be passed into functions as arguments.", code: "def attack(damage):\n    print(\"Hit for:\", damage)\n\nattack(50)" },
+                    { title: "4.3 Return Values", desc: "Let a function return a calculated value back to the program.", code: "def add(a, b):\n    return a + b\n\nresult = add(5, 5)\nprint(result)" }
+                ]
+            }
         ];
 
-        let activeIndex = 0;
+        let activeLesson = null;
+        let pyodideInstance = null;
 
-        /* --- 2. INITIALIZATION ON DOM LOAD --- */
-        document.addEventListener("DOMContentLoaded", () => {
-            initParticleEngine();
+        // --- 2. INITIALIZE SYSTEM ---
+        async function bootSystem() {
+            renderCurriculum();
             bindEvents();
-            buildSidebar();
-            loadLesson(0);
-        });
+            loadLesson(0, 0);
 
-        /* --- 3. EVENT BINDINGS (FIXING CLICKS) --- */
-        function bindEvents() {
-            // View Navigation
-            document.getElementById("btn-enter").addEventListener("click", () => {
-                document.getElementById("view-landing").classList.remove("active");
-                document.getElementById("view-dashboard").classList.add("active");
-            });
-
-            // Audio Controls
-            const audioEl = document.getElementById("audio-player");
-            const btnAudio = document.getElementById("btn-audio");
-            let isPlaying = false;
-            
-            btnAudio.addEventListener("click", () => {
-                if (!isPlaying) {
-                    audioEl.play().then(() => {
-                        btnAudio.innerText = "⏸ Pause Audio";
-                        btnAudio.style.borderColor = "var(--cyan)";
-                        btnAudio.style.color = "var(--cyan)";
-                        isPlaying = true;
-                    }).catch(err => {
-                        alert("Browser prevented audio playback. Ensure file exists and volume is up.");
-                        console.error(err);
-                    });
-                } else {
-                    audioEl.pause();
-                    btnAudio.innerText = "▶ Init Audio";
-                    btnAudio.style.borderColor = "var(--gold)";
-                    btnAudio.style.color = "var(--gold)";
-                    isPlaying = false;
-                }
-            });
-
-            // Editor Sync (Watermark Scrolling & Indentation)
-            const inputLayer = document.getElementById("code-input");
-            const watermark = document.getElementById("code-watermark");
-            
-            inputLayer.addEventListener("scroll", () => {
-                watermark.scrollTop = inputLayer.scrollTop;
-                watermark.scrollLeft = inputLayer.scrollLeft;
-            });
-
-            inputLayer.addEventListener("keydown", (e) => {
-                if (e.key === "Tab") {
-                    e.preventDefault();
-                    let start = inputLayer.selectionStart;
-                    let end = inputLayer.selectionEnd;
-                    inputLayer.value = inputLayer.value.substring(0, start) + "    " + inputLayer.value.substring(end);
-                    inputLayer.selectionStart = inputLayer.selectionEnd = start + 4;
-                }
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    let start = inputLayer.selectionStart;
-                    let text = inputLayer.value;
-                    let lastLine = text.substring(text.lastIndexOf("\n", start - 1) + 1, start);
-                    let match = lastLine.match(/^[\s]+/);
-                    let space = match ? match[0] : "";
-                    inputLayer.value = text.substring(0, start) + "\n" + space + text.substring(start);
-                    inputLayer.selectionStart = inputLayer.selectionEnd = start + 1 + space.length;
-                }
-            });
-
-            // Run Button
-            document.getElementById("btn-run").addEventListener("click", runCode);
-
-            // AI Button
-            document.getElementById("btn-ai").addEventListener("click", queryGroq);
+            // Boot Real Python Engine via Pyodide
+            try {
+                pyodideInstance = await loadPyodide();
+                document.getElementById("py-status").innerHTML = `<span style="color: var(--success);">● Python Core Online</span>`;
+                document.getElementById("terminal-output").innerText = "Python 3 WebAssembly Runtime Ready.\nExecute code when ready.";
+            } catch (err) {
+                document.getElementById("py-status").innerHTML = `<span style="color: var(--error);">● Python Core Failed</span>`;
+                document.getElementById("terminal-output").innerText = "Critical Error: Could not fetch Python engine. Check internet connection.";
+            }
         }
 
-        /* --- 4. DYNAMIC UI BUILDERS --- */
-        function buildSidebar() {
-            const list = document.getElementById("lesson-list");
-            list.innerHTML = "";
-            LESSONS.forEach((l, idx) => {
-                let div = document.createElement("div");
-                div.className = "lesson-item";
-                div.innerText = l.title;
-                div.id = "nav-" + idx;
-                div.addEventListener("click", () => loadLesson(idx));
-                list.appendChild(div);
+        // --- 3. UI RENDERERS ---
+        function renderCurriculum() {
+            const container = document.getElementById("curriculum-container");
+            CURRICULUM.forEach((mod, mIdx) => {
+                // Module Header
+                let modDiv = document.createElement("div");
+                modDiv.className = "module-group";
+                modDiv.innerHTML = `<div class="module-title">${mod.module}</div>`;
+                
+                // Sublessons Container
+                let lessonsDiv = document.createElement("div");
+                mod.lessons.forEach((les, lIdx) => {
+                    let lesDiv = document.createElement("div");
+                    lesDiv.className = "sublesson";
+                    lesDiv.id = `les-${mIdx}-${lIdx}`;
+                    lesDiv.innerText = les.title;
+                    lesDiv.onclick = () => loadLesson(mIdx, lIdx);
+                    lessonsDiv.appendChild(lesDiv);
+                });
+
+                modDiv.appendChild(lessonsDiv);
+                container.appendChild(modDiv);
             });
         }
 
-        function loadLesson(idx) {
-            activeIndex = idx;
-            document.querySelectorAll(".lesson-item").forEach(el => el.classList.remove("active"));
-            document.getElementById("nav-" + idx).classList.add("active");
+        function loadLesson(mIdx, lIdx) {
+            // Update active state in sidebar
+            document.querySelectorAll(".sublesson").forEach(el => el.classList.remove("active"));
+            const target = document.getElementById(`les-${mIdx}-${lIdx}`);
+            if(target) target.classList.add("active");
+
+            // Load data
+            activeLesson = CURRICULUM[mIdx].lessons[lIdx];
+            document.getElementById("lbl-title").innerText = activeLesson.title;
+            document.getElementById("lbl-desc").innerText = activeLesson.desc;
+            document.getElementById("lbl-target").innerText = activeLesson.code;
             
-            const l = LESSONS[idx];
-            document.getElementById("lesson-title").innerText = l.title;
-            document.getElementById("lesson-desc").innerText = l.desc;
-            
-            document.getElementById("code-watermark").innerText = l.code;
-            document.getElementById("code-input").value = "";
-            document.getElementById("terminal").innerText = "Ready for execution...";
+            // Clear editor
+            document.getElementById("code-editor").value = "";
+            if(pyodideInstance) document.getElementById("terminal-output").innerText = "Ready.";
         }
 
-        /* --- 5. PYTHON TERMINAL SIMULATOR --- */
-        function runCode() {
-            const input = document.getElementById("code-input").value.trim();
-            const target = LESSONS[activeIndex].code.trim();
-            const term = document.getElementById("terminal");
+        // --- 4. REAL PYTHON EXECUTION ---
+        async function executeCode() {
+            const term = document.getElementById("terminal-output");
+            const code = document.getElementById("code-editor").value.trim();
 
-            if(input === "") {
-                term.innerHTML = "<span style='color: #ef4444;'>Error: Input is empty.</span>";
+            if (!pyodideInstance) {
+                term.innerHTML = `<span class="error-text">System Error: Python engine is still booting or failed to load.</span>`;
                 return;
             }
 
-            term.innerHTML = "Processing syntax...<br>";
-
-            setTimeout(() => {
-                if (input === target) {
-                    if (input.includes("print(")) {
-                        let msg = input.match(/print\((["'])(.*?)\1\)/);
-                        term.innerHTML += `<span style='color: var(--cyan);'>Output: ${msg ? msg[2] : "Success"}</span>`;
-                    } else {
-                        term.innerHTML += "<span style='color: #10b981;'>Execution Successful. Exit Code 0.</span>";
-                    }
-                } else {
-                    term.innerHTML += "<span style='color: #ef4444;'>SyntaxError: Code does not match target logic matrix exactly.</span>";
-                }
-            }, 400);
-        }
-
-        /* --- 6. GROQ AI INTEGRATION --- */
-        function queryGroq() {
-            const q = document.getElementById("ai-query").value;
-            const code = document.getElementById("code-input").value;
-            const out = document.getElementById("ai-response");
-            const lesson = LESSONS[activeIndex];
-
-            if (!q.trim()) {
-                out.innerText = "Please type a question in the input field.";
+            if (code === "") {
+                term.innerHTML = `<span class="error-text">Input Empty. Write some Python code first.</span>`;
                 return;
             }
 
-            out.innerHTML = "<span style='color: var(--gold);'>Connecting to Groq Neural Network...</span>";
+            term.innerText = "Running...";
+            let outputBuffer = "";
 
+            // Capture Python's print() statements
+            pyodideInstance.setStdout({ batched: (msg) => { outputBuffer += msg + "\n"; }});
+            pyodideInstance.setStderr({ batched: (msg) => { outputBuffer += msg + "\n"; }});
+
+            try {
+                // Run the real Python code!
+                await pyodideInstance.runPythonAsync(code);
+                
+                if (outputBuffer.trim() === "") {
+                    term.innerHTML = `<span style="color: var(--text-muted);">Process finished with no output (exit code 0).</span>`;
+                } else {
+                    term.innerText = outputBuffer;
+                }
+            } catch (err) {
+                // Catch actual Python SyntaxErrors and Tracebacks
+                term.innerHTML = `<span class="error-text">${err.toString()}</span>`;
+            }
+        }
+
+        // --- 5. GROQ AI INTEGRATION ---
+        function askAI() {
+            const inputEl = document.getElementById("ai-input");
+            const question = inputEl.value.trim();
+            const code = document.getElementById("code-editor").value;
+            const chat = document.getElementById("chat-history");
+
+            if(!question) return;
+
+            // Add user message to UI
+            chat.innerHTML += `<div class="chat-bubble user-message">${question}</div>`;
+            inputEl.value = "";
+            chat.scrollTop = chat.scrollHeight;
+
+            // Loading state
+            const loadId = "load-" + Date.now();
+            chat.innerHTML += `<div class="chat-bubble ai-message" id="${loadId}">Thinking...</div>`;
+            chat.scrollTop = chat.scrollHeight;
+
+            // Call Groq AI
             fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: "POST",
                 headers: {
@@ -553,41 +397,62 @@
                 body: JSON.stringify({
                     model: "llama3-8b-8192",
                     messages: [
-                        { role: "system", content: "You are a Python tutor. Keep answers short, direct, and helpful for a beginner." },
-                        { role: "user", content: `Lesson: ${lesson.title}\nCode written: ${code}\nQuestion: ${q}` }
+                        { role: "system", content: "You are an expert Python tutor. Keep answers brief, under 3 sentences. Fix the user's code directly if they ask." },
+                        { role: "user", content: `Context Lesson: ${activeLesson.title}\nUser Code:\n${code}\n\nQuestion: ${question}` }
                     ],
                     temperature: 0.3
                 })
             })
-            .then(res => {
-                if (!res.ok) throw new Error("API Error");
-                return res.json();
-            })
+            .then(res => res.json())
             .then(data => {
-                out.innerText = data.choices[0].message.content;
+                document.getElementById(loadId).innerText = data.choices[0].message.content;
+                chat.scrollTop = chat.scrollHeight;
             })
             .catch(err => {
-                out.innerHTML = "<span style='color: #ef4444;'>Connection failed. Verify API key, internet, or CORS policies.</span>";
+                document.getElementById(loadId).innerHTML = `<span class="error-text">API Connection Error. Verify API key or CORS.</span>`;
             });
         }
 
-        /* --- 7. BACKGROUND PARTICLE ENGINE --- */
-        function initParticleEngine() {
-            const canvas = document.getElementById("particle-canvas");
-            const phrases = ["import sys", "def render():", "yield matrix", "class Guru:", "while True:", "return data"];
-            
-            setInterval(() => {
-                let drop = document.createElement("div");
-                drop.className = "code-drop";
-                drop.innerText = phrases[Math.floor(Math.random() * phrases.length)];
-                drop.style.left = Math.random() * 100 + "vw";
-                drop.style.animationDuration = (Math.random() * 5 + 10) + "s"; // 10 to 15 seconds
-                canvas.appendChild(drop);
+        // --- 6. EVENT BINDINGS & FIXES ---
+        function bindEvents() {
+            // Run Code Button
+            document.getElementById("btn-run").addEventListener("click", executeCode);
 
-                // Cleanup to prevent DOM overload
-                setTimeout(() => { drop.remove(); }, 15000);
-            }, 800); // Create a new particle every 0.8 seconds
+            // Ask AI Button
+            document.getElementById("btn-ask-ai").addEventListener("click", askAI);
+
+            // Handle Tab Key in Editor for proper indentation
+            const editor = document.getElementById("code-editor");
+            editor.addEventListener("keydown", function(e) {
+                if (e.key === "Tab") {
+                    e.preventDefault();
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+                    this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+                    this.selectionStart = this.selectionEnd = start + 4;
+                }
+            });
+
+            // Audio Player Logic
+            const audio = document.getElementById("bg-audio");
+            const btnAudio = document.getElementById("btn-audio");
+            let isPlaying = false;
+
+            btnAudio.addEventListener("click", () => {
+                if (!isPlaying) {
+                    audio.play();
+                    btnAudio.innerText = "⏸ Pause Audio";
+                    isPlaying = true;
+                } else {
+                    audio.pause();
+                    btnAudio.innerText = "▶ Play Audio";
+                    isPlaying = false;
+                }
+            });
         }
+
+        // Boot up the entire system when page loads
+        window.onload = bootSystem;
     </script>
 </body>
 </html>
