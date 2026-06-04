@@ -2,131 +2,111 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Python Guru | Cyber-Academy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@300;400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    <title>Python Guru | Cyber-Classical Academy</title>
     <style>
         :root {
-            --bg-void: #060811;
             --cyan: #00e5ff;
-            --gold: #e5c158;
+            --gold: #f4d03f;
+            --bg: #050a0f;
+            --glass: rgba(10, 20, 30, 0.7);
         }
 
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-void); color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
-
-        /* --- THE PORTAL LAYER (High Fidelity) --- */
-        #portal-layer {
-            position: fixed; inset: 0; z-index: 1000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: radial-gradient(circle at center, #101625 0%, #060811 100%);
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--bg);
+            color: white; font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* The Rotating 3D Dodecahedron (The 6-edge Box from Image) */
-        .geometry-container {
-            position: absolute; width: 300px; height: 300px;
-            perspective: 1000px;
-            pointer-events: none;
+        /* --- BACKGROUND ATMOSPHERE --- */
+        .bg-layer {
+            position: absolute; inset: 0; z-index: 0;
+            background: radial-gradient(circle, #1a2a40 0%, var(--bg) 80%);
         }
-        .dodecahedron {
-            width: 100%; height: 100%; position: relative;
+
+        /* The Rotating Central Matrix */
+        .central-matrix {
+            position: absolute; width: 400px; height: 400px;
             transform-style: preserve-3d;
-            animation: rotate3d 20s infinite linear;
+            animation: rotateFull 20s infinite linear;
         }
-        .face {
+        @keyframes rotateFull { from { transform: rotateY(0deg) rotateX(0deg); } to { transform: rotateY(360deg) rotateX(360deg); } }
+        
+        .matrix-face {
             position: absolute; width: 100%; height: 100%;
-            border: 1px solid var(--cyan);
+            border: 2px solid var(--cyan); box-shadow: 0 0 30px var(--cyan);
             background: rgba(0, 229, 255, 0.05);
-            box-shadow: 0 0 15px var(--cyan);
         }
-        @keyframes rotate3d { from { transform: rotateY(0deg) rotateX(0deg); } to { transform: rotateY(360deg) rotateX(360deg); } }
 
-        /* The Interface Box */
-        .ui-box {
+        /* Gothic Arches (Stylized) */
+        .arch {
+            position: absolute; top: 20%; width: 150px; height: 300px;
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            border-top-left-radius: 100px; border-top-right-radius: 100px;
+            opacity: 0.5;
+        }
+
+        /* --- UI PANEL --- */
+        .ui-panel {
             position: relative; z-index: 10;
-            background: rgba(15, 19, 34, 0.6);
-            border: 1px solid rgba(0, 229, 255, 0.3);
-            padding: 60px 80px; text-align: center;
+            background: var(--glass);
+            border: 1px solid var(--cyan);
             backdrop-filter: blur(15px);
+            padding: 40px; text-align: center;
+            max-width: 700px;
         }
-        .ui-box h1 { font-family: 'Cinzel', serif; font-size: 3.5rem; color: var(--gold); margin: 0 0 20px 0; text-shadow: 0 0 20px var(--gold); letter-spacing: 2px; }
-        .ui-box p { color: var(--cyan); letter-spacing: 4px; text-transform: uppercase; font-size: 0.9rem; margin-bottom: 50px; }
-        
-        .btn-enter {
-            background: transparent; border: 1px solid var(--cyan); color: var(--cyan);
-            padding: 15px 40px; font-family: 'Inter'; font-weight: bold; cursor: pointer;
-            transition: all 0.3s; text-transform: uppercase;
-        }
-        .btn-enter:hover { background: var(--cyan); color: var(--bg-void); box-shadow: 0 0 20px var(--cyan); }
 
-        /* --- WORKSPACE LAYER (Hidden initially) --- */
-        #workspace-layer { display: none; height: 100vh; }
-        
-        /* IDE Styles */
-        .top-bar { height: 50px; background: #0f1322; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        .workspace-grid { display: grid; grid-template-columns: 250px 1fr 300px; height: calc(100vh - 50px); }
-        .editor-area { background: #03050a; padding: 20px; display: flex; flex-direction: column; }
-        #code-input { flex: 1; background: transparent; color: #a5d6ff; border: none; font-family: 'JetBrains Mono'; font-size: 1.1rem; width: 100%; resize: none; }
-        .btn { cursor: pointer; padding: 10px; background: #1f2937; color: white; border: 1px solid #374151; }
+        h1 { color: var(--gold); font-size: 3rem; margin: 0; text-shadow: 0 0 15px var(--gold); }
+        h2 { font-size: 1.2rem; letter-spacing: 3px; color: var(--cyan); margin-bottom: 30px; }
+        p { line-height: 1.6; color: #d1d1d1; font-size: 0.95rem; }
+
+        .btn-row { display: flex; justify-content: center; gap: 20px; margin-top: 30px; }
+        .btn {
+            padding: 12px 30px; border: 1px solid var(--cyan);
+            background: transparent; color: white; cursor: pointer;
+            transition: 0.3s; text-transform: uppercase;
+        }
+        .btn:hover { background: var(--cyan); color: var(--bg); }
+
+        /* Top Bar */
+        .top-nav {
+            position: absolute; top: 0; width: 100%; padding: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(to bottom, #000, transparent);
+        }
     </style>
 </head>
 <body>
 
-    <div id="portal-layer">
-        <div class="geometry-container">
-            <div class="dodecahedron">
-                <div class="face" style="transform: rotateY(0deg) translateZ(150px);"></div>
-                <div class="face" style="transform: rotateY(90deg) translateZ(150px);"></div>
-                <div class="face" style="transform: rotateY(180deg) translateZ(150px);"></div>
-                <div class="face" style="transform: rotateX(90deg) translateZ(150px);"></div>
-            </div>
+    <div class="bg-layer"></div>
+    
+    <!-- Navigation -->
+    <div class="top-nav">
+        <div style="font-weight:bold; font-size: 1.2rem;">PYTHON GURU</div>
+        <div>
+            <span>|| Pause Audio</span>
+            <span style="margin-left: 20px; color: var(--cyan);">● Local WebAssembly Interpreter Engine...</span>
         </div>
+    </div>
+
+    <!-- Central Rotating Matrix -->
+    <div class="central-matrix">
+        <div class="matrix-face" style="transform: translateZ(200px);"></div>
+        <div class="matrix-face" style="transform: rotateY(90deg) translateZ(200px);"></div>
+    </div>
+
+    <!-- Main Panel -->
+    <div class="ui-panel">
+        <h1>PYTHON GURU</h1>
+        <h2>THE CYBER-CLASSICAL LEARNING ACADEMY | ZERO TO HERO INTERACTIVE ACADEMY</h2>
+        <p>Welcome to an interactive Python learning environment. This system compiles actual execution scripts locally via WebAssembly, handles advanced tracking with victory milestones, and connects to an online AI Coprocessor.</p>
         
-        <div class="ui-box">
-            <h1>PYTHON GURU</h1>
-            <p>THE CYBER-CLASSICAL LEARNING ACADEMY</p>
-            <button class="btn-enter" onclick="transitionToAcademy()">Enter Training Ground</button>
+        <div class="btn-row">
+            <button class="btn">▶ Initialize Core Ambience</button>
+            <button class="btn">Enter Training Ground</button>
         </div>
     </div>
 
-    <div id="workspace-layer">
-        <div class="top-bar">
-            <div style="font-family: 'Cinzel'; font-weight: bold;">Python Guru</div>
-            <div>
-                <button class="btn" id="audio-toggle">▶ Play Audio</button>
-                <span id="status" style="font-size: 0.8rem; margin-left: 10px;">System: Online</span>
-            </div>
-        </div>
-        <div class="workspace-grid">
-            <div style="background: #0f1322; border-right: 1px solid #333; padding: 20px;">Curriculum</div>
-            <div class="editor-area">
-                <textarea id="code-input" placeholder="Write code here..."></textarea>
-                <button class="btn" onclick="executeCode()">Execute</button>
-            </div>
-            <div style="background: #0f1322; border-left: 1px solid #333; padding: 20px;">AI Assistant</div>
-        </div>
-    </div>
-
-    <script>
-        function transitionToAcademy() {
-            const portal = document.getElementById('portal-layer');
-            portal.style.transition = "opacity 1s ease";
-            portal.style.opacity = "0";
-            setTimeout(() => {
-                portal.style.display = "none";
-                document.getElementById('workspace-layer').style.display = "block";
-            }, 1000);
-        }
-
-        async function executeCode() {
-            // Implementation of the Pyodide runner (as established in previous steps)
-            alert("Executing Python Engine...");
-        }
-
-        const audio = new Audio('music.mp3'); // Ensure this file exists
-        document.getElementById('audio-toggle').onclick = (e) => {
-            if(audio.paused) { audio.play(); e.target.innerText = "⏸ Pause Audio"; }
-            else { audio.pause(); e.target.innerText = "▶ Play Audio"; }
-        };
-    </script>
 </body>
 </html>
